@@ -14,7 +14,7 @@ class SeleniumMatchParser:
         if len(tds) < 21:
             return None
         
-        game_type_img = self._extract_image_source(tds[5])
+        game_type_img = self._extract_image_source(tds[3])
         game_type_strategy = GameTypeStrategyFactory.create_strategy(game_type_img)
         
         game_type = game_type_strategy.identify_type_name()

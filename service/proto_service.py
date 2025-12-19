@@ -21,12 +21,16 @@ class ProtoService:
 
         elements = self.page.extract_match_elements()
         
+        round_display = round_value
+        if len(round_value) > 4:
+            round_display = round_value[4:]
+        
         matches = []
         for element in elements:
             try:
                 data_dict = self.parser.parse_row(element)
                 if data_dict:
-                    match = Match.create_from_extracted_data(data_dict, round_value)
+                    match = Match.create_from_extracted_data(data_dict, round_display)
                     matches.append(match)
             except Exception as e:
                 print(f"Error parsing match: {e}")
