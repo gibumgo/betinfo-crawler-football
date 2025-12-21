@@ -31,7 +31,7 @@ class Match:
     result_odds: str
 
     @classmethod
-    def create_from_extracted_data(cls, data: dict, round_val: str):
+    def of(cls, data: dict, round_val: str):
         from domain.policies.odds_policy import OddsPolicy
         
         result = data.get("result", "")

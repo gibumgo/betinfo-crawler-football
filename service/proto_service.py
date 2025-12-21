@@ -30,7 +30,7 @@ class ProtoService:
             try:
                 data_dict = self.parser.parse_row(element)
                 if data_dict:
-                    match = Match.create_from_extracted_data(data_dict, round_display)
+                    match = Match.of(data_dict, round_display)
                     matches.append(match)
             except Exception as e:
                 print(f"Error parsing match: {e}")
