@@ -30,4 +30,7 @@ def main():
             time.sleep(1)
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n\n사용자에 의해 프로그램이 종료되었습니다.")
