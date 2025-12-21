@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
-from parser.game_type_strategies import GameTypeStrategyFactory
-from parser.odds_strategies import InitialOddsStrategy, CurrentOddsStrategy
+from parser.game_type_strategies.game_type_strategy_factory import GameTypeStrategyFactory
+from parser.odds_strategies.initial_odds_strategy import InitialOddsStrategy
+from parser.odds_strategies.current_odds_strategy import CurrentOddsStrategy
 
 
 class BetinfoMatchParser:

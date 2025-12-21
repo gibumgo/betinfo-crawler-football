@@ -43,7 +43,6 @@ class FlashscoreRepository:
         self.save_matches(filename, match_list)
 
     def _save_to_csv(self, items: list, column_map: dict, filename: str) -> None:
-        """데이터를 컬럼 맵핑에 따라 CSV로 저장하는 공통 로직"""
         csv_rows = []
         for item in items:
             data_dict = asdict(item)
