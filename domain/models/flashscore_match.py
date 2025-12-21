@@ -14,9 +14,29 @@ class FlashscoreMatch:
     match_datetime: str       # 경기일시
     round: str                # 라운드
     season: str               # 시즌
-    home_score: Optional[str] # 홈점수
-    away_score: Optional[str] # 원정점수
+    home_score: Optional[int] # 홈점수
+    away_score: Optional[int] # 원정점수
     flashscore_match_id: str  # 경기ID
+
+    @classmethod
+    def create(cls, **kwargs):
+        """파서에서 사용하는 명시적 생성 메서드"""
+        return cls(
+            id=str(kwargs.get("id", "")),
+            league_id=str(kwargs.get("league_id", "")),
+            home_team_name=kwargs.get("home_team_name", ""),
+            away_team_name=kwargs.get("away_team_name", ""),
+            url_team1_name_en=kwargs.get("url_team1_name_en", ""),
+            url_team2_name_en=kwargs.get("url_team2_name_en", ""),
+            url_team1_id=kwargs.get("url_team1_id", ""),
+            url_team2_id=kwargs.get("url_team2_id", ""),
+            match_datetime=str(kwargs.get("match_datetime", "")),
+            round=str(kwargs.get("round", "0")),
+            season=kwargs.get("season", ""),
+            home_score=kwargs.get("home_score"),
+            away_score=kwargs.get("away_score"),
+            flashscore_match_id=kwargs.get("flashscore_match_id", "")
+        )
 
     @classmethod
     def of(cls, raw_data: dict):

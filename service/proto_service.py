@@ -1,5 +1,5 @@
 from scraper.betinfo_page import BetinfoPage
-from parser.betinfo_match_parser import BetinfoMatchParser
+from parsers.betinfo_match_parser import BetinfoMatchParser
 from repository.csv_repository import CSVRepository
 from domain.models.match import Match
 

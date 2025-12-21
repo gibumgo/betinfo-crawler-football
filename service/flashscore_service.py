@@ -1,7 +1,7 @@
 import time
 import random
 from scraper.flashscore.flashscore_page import FlashscorePage
-from parser.flashscore.match_parser import MatchParser
+from parsers.flashscore_match_parser import MatchParser
 from repository.flashscore_repository import FlashscoreRepository
 
 class FlashscoreService:
