@@ -1,5 +1,5 @@
 from scraper.betinfo_page import BetinfoPage
-from parser.selenium_match_parser import SeleniumMatchParser
+from parser.betinfo_match_parser import BetinfoMatchParser
 from repository.csv_repository import CSVRepository
 from domain.models.match import Match
 
@@ -12,7 +12,7 @@ class ProtoService:
     ):
         self.page = page
         self.repository = repository
-        self.parser = SeleniumMatchParser()
+        self.parser = BetinfoMatchParser()
     
     def collect_round(self, round_value: str) -> None:
         self.page.open()

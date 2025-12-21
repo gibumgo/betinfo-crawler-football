@@ -3,7 +3,7 @@ from parser.game_type_strategies import GameTypeStrategyFactory
 from parser.odds_strategies import InitialOddsStrategy, CurrentOddsStrategy
 
 
-class SeleniumMatchParser:
+class BetinfoMatchParser:
     def __init__(self):
         self.initial_odds_parser = InitialOddsStrategy()
         self.current_odds_parser = CurrentOddsStrategy()
