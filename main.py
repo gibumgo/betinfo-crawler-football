@@ -1,36 +1,33 @@
-from driver.chrome_driver_factory import ChromeDriverFactory
-from scraper.betinfo_page import BetinfoPage
-from repository.csv_repository import CSVRepository
-from service.proto_service import ProtoService
+from controller.betinfo_controller import BetinfoController
+from controller.flashscore_controller import FlashscoreController
+from view.console_view import ConsoleView
+import time
 
+def main():
+    view = ConsoleView()
+    
+    SITE_CONTROLLERS = {
+        '1': BetinfoController,
+        '2': FlashscoreController
+    }
 
-def run(start_round: int, end_round: int):
-    driver = ChromeDriverFactory.create()
+    while True:
+        view.display_welcome()
+        choice = view.get_site_choice()
 
-    try:
-        page = BetinfoPage(driver)
-        repository = CSVRepository()
+        if choice == 'Q':
+            view.display_status("프로그램을 종료합니다. 감사합니다!", "info")
+            break
 
-        service = ProtoService(
-            page=page,
-            repository=repository
-        )
-
-        for round_num in range(start_round, end_round + 1):
-            round_value = str(round_num)
-            print(f"🔄 {round_value} 회차 처리 중...")
-
-            service.collect_round(round_value)
-
-    except Exception as e:
-        print(f"[치명적 오류] 실행 중단: {e}")
-
-    finally:
-        driver.quit()
-
+        controller_class = SITE_CONTROLLERS.get(choice)
+        
+        if controller_class:
+            controller = controller_class()
+            controller.start_collection()
+            input("\n메뉴로 돌아가려면 엔터를 누르세요...")
+        else:
+            view.display_status("잘못된 입력입니다. 다시 선택해주세요.", "warning")
+            time.sleep(1)
 
 if __name__ == "__main__":
-    start_round = int(input("시작 회차 (예: 2025040): "))
-    end_round = int(input("끝 회차 (예: 2025045): "))
-
-    run(start_round, end_round)
+    main()
