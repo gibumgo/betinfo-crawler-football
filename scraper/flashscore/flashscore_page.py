@@ -29,3 +29,13 @@ class FlashscorePage(BaseScraper):
         full_url = f"{self.BASE_URL}{path}/fixtures/"
         self.open_url(full_url)
         self.wait_for_element(".event__match")
+
+    def click_show_more(self) -> bool:
+        """'더 보기' 버튼이 있으면 클릭합니다."""
+        try:
+            from selenium.webdriver.common.by import By
+            show_more_button = self.driver.find_element(By.CSS_SELECTOR, ".event__more")
+            self.driver.execute_script("arguments[0].click();", show_more_button)
+            return True
+        except:
+            return False
