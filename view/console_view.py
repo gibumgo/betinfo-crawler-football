@@ -26,8 +26,10 @@ class ConsoleView:
     @staticmethod
     def get_collection_params():
         print("-" * 60)
-        league_path = input("📍 리그 경로 (예: /football/england/premier-league/): ").strip()
-        season = input("📅 시즌 (예: 2024-2025): ").strip() or "2024-2025"
+        print("📍 리그 경로 (예: /soccer/england/premier-league/)")
+        league_path = input("👉 입력: ").strip() or "/soccer/england/premier-league/"
+        
+        season = input("📅 시즌 (예: 2025-2026) [엔터: 2025-2026]: ").strip() or "2025-2026"
         
         print("\n[옵션] 특정 라운드 범위 수집 (엔터 입력 시 최신 라운드만)")
         start_round = input("➡️ 시작 라운드: ").strip()

@@ -16,9 +16,14 @@ class FlashscoreService:
         return nation.replace("-", "_"), league.replace("-", "_")
 
     def collect_matches_data(self, league_path: str, season: str = "2025-2026", start_round: int = None, end_round: int = None):
+        league_path = league_path.strip()
+        if not league_path.startswith('/'):
+            league_path = '/' + league_path
         league_path = league_path.rstrip('/')
+
         if season and season != "2025-2026" and f"-{season}" not in league_path:
             league_path = f"{league_path}-{season}"
+        
         league_path += "/"
 
         print(f"🕒 경기 결과 수집 시작 ({season}): {league_path}")
