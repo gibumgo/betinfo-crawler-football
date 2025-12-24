@@ -1,13 +1,13 @@
 from driver.chrome_driver_factory import ChromeDriverFactory
 from scraper.betinfo_page import BetinfoPage
-from repository.csv_repository import CSVRepository
-from service.proto_service import ProtoService
+from repository.betinfo_repository import BetinfoRepository
+from service.betinfo_service import BetinfoService
 from view.console_view import ConsoleView
 
 class BetinfoController:
     def __init__(self):
         self.view = ConsoleView()
-        self.repository = CSVRepository()
+        self.repository = BetinfoRepository()
 
     def start_collection(self):
         self.view.display_betinfo_settings()
@@ -24,7 +24,7 @@ class BetinfoController:
             driver = ChromeDriverFactory.create()
             
             page = BetinfoPage(driver)
-            service = ProtoService(page=page, repository=self.repository)
+            service = BetinfoService(page=page, repository=self.repository)
             
             for round_num in range(int(start_round), int(end_round) + 1):
                 round_val = str(round_num)

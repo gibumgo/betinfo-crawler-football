@@ -1,14 +1,14 @@
 from scraper.betinfo_page import BetinfoPage
 from parsers.betinfo_match_parser import BetinfoMatchParser
-from repository.csv_repository import CSVRepository
+from repository.betinfo_repository import BetinfoRepository
 from domain.models.match import Match
 
 
-class ProtoService:
+class BetinfoService:
     def __init__(
         self,
         page: BetinfoPage,
-        repository: CSVRepository
+        repository: BetinfoRepository
     ):
         self.page = page
         self.repository = repository

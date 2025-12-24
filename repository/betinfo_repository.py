@@ -3,7 +3,7 @@ from dataclasses import asdict
 from domain.models.match import Match
 
 
-class CSVRepository:
+class BetinfoRepository:
     COLUMN_MAP = {
         "round": "회차",
         "game_number": "경기번호",
