@@ -1,6 +1,6 @@
 import time
 from selenium.webdriver.common.by import By
-from scraper.base_scraper import BaseScraper
+from infrastructure.scraping.scrapers.base_scraper import BaseScraper
 
 class BetinfoPage(BaseScraper):
     URL = "https://www.betinfo.co.kr/z_protorate/protoRate2.asp"

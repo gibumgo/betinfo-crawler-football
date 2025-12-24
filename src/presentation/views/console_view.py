@@ -1,9 +1,9 @@
-from view.menu_view import MenuView
-from view.input_view import InputView
-from view.flashscore_match_message_view import FlashscoreMatchMessageView
-from view.flashscore_meta_message_view import FlashscoreMetaMessageView
-from view.betinfo_message_view import BetinfoMessageView
-from view.common_message_view import CommonMessageView
+from presentation.views.menu_view import MenuView
+from presentation.views.input_view import InputView
+from presentation.views.flashscore_match_message_view import FlashscoreMatchMessageView
+from presentation.views.flashscore_meta_message_view import FlashscoreMetaMessageView
+from presentation.views.betinfo_message_view import BetinfoMessageView
+from presentation.views.common_message_view import CommonMessageView
 
 class ConsoleView:
     def __init__(self):

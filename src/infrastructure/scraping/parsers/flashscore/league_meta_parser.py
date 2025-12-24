@@ -4,8 +4,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from domain.models.league_team import LeagueTeam
 from config import DEFAULT_SEASON
 from domain.exceptions import ParsingException
-from parsers.flashscore.league_info_extractor import LeagueInfoExtractor
-from parsers.flashscore.team_list_extractor import TeamListExtractor
+from infrastructure.scraping.parsers.flashscore.league_info_extractor import LeagueInfoExtractor
+from infrastructure.scraping.parsers.flashscore.team_list_extractor import TeamListExtractor
 
 class LeagueMetaParser:  
     @staticmethod

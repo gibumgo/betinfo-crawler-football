@@ -1,9 +1,9 @@
-from driver.chrome_driver_factory import ChromeDriverFactory
-from scraper.flashscore.flashscore_page import FlashscorePage
-from repository.flashscore_repository import FlashscoreRepository
-from service.flashscore_service import FlashscoreService
-from service.flashscore_meta_service import FlashscoreMetaService
-from view.console_view import ConsoleView
+from infrastructure.scraping.drivers.chrome_driver_factory import ChromeDriverFactory
+from infrastructure.scraping.scrapers.flashscore.flashscore_page import FlashscorePage
+from infrastructure.repositories.flashscore_repository import FlashscoreRepository
+from application.services.flashscore_service import FlashscoreService
+from application.services.flashscore_meta_service import FlashscoreMetaService
+from presentation.views.console_view import ConsoleView
 
 class FlashscoreController:
     def __init__(self, view: ConsoleView, repository: FlashscoreRepository, error_handler):

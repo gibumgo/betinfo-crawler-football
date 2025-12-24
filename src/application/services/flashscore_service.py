@@ -1,6 +1,6 @@
-from scraper.flashscore.flashscore_page import FlashscorePage
-from parsers.flashscore_match_parser import MatchParser
-from repository.flashscore_repository import FlashscoreRepository
+from infrastructure.scraping.scrapers.flashscore.flashscore_page import FlashscorePage
+from infrastructure.scraping.parsers.flashscore_match_parser import MatchParser
+from infrastructure.repositories.flashscore_repository import FlashscoreRepository
 from config import DEFAULT_SEASON
 
 class FlashscoreService:

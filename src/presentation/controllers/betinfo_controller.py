@@ -1,8 +1,8 @@
-from driver.chrome_driver_factory import ChromeDriverFactory
-from scraper.betinfo_page import BetinfoPage
-from repository.betinfo_repository import BetinfoRepository
-from service.betinfo_service import BetinfoService
-from view.console_view import ConsoleView
+from infrastructure.scraping.drivers.chrome_driver_factory import ChromeDriverFactory
+from infrastructure.scraping.scrapers.betinfo_page import BetinfoPage
+from infrastructure.repositories.betinfo_repository import BetinfoRepository
+from application.services.betinfo_service import BetinfoService
+from presentation.views.console_view import ConsoleView
 
 class BetinfoController:
     def __init__(self, view: ConsoleView, repository: BetinfoRepository, error_handler):

@@ -1,9 +1,14 @@
-from controller.betinfo_controller import BetinfoController
-from controller.flashscore_controller import FlashscoreController
-from view.console_view import ConsoleView
-from repository.betinfo_repository import BetinfoRepository
-from repository.flashscore_repository import FlashscoreRepository
-from util.error_handler import ErrorHandler
+import sys
+import os
+
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+
+from presentation.controllers.betinfo_controller import BetinfoController
+from presentation.controllers.flashscore_controller import FlashscoreController
+from presentation.views.console_view import ConsoleView
+from infrastructure.repositories.betinfo_repository import BetinfoRepository
+from infrastructure.repositories.flashscore_repository import FlashscoreRepository
+from shared.error_handler import ErrorHandler
 import time
 
 def main():

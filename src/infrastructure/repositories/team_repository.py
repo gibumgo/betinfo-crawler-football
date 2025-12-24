@@ -1,4 +1,4 @@
-from repository.base_repository import BaseRepository
+from infrastructure.repositories.base_repository import BaseRepository
 from domain.models.team import Team
 
 class TeamRepository(BaseRepository):

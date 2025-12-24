@@ -1,6 +1,6 @@
-from scraper.flashscore.flashscore_page import FlashscorePage
-from parsers.flashscore.league_meta_parser import LeagueMetaParser
-from repository.flashscore_repository import FlashscoreRepository
+from infrastructure.scraping.scrapers.flashscore.flashscore_page import FlashscorePage
+from infrastructure.scraping.parsers.flashscore.league_meta_parser import LeagueMetaParser
+from infrastructure.repositories.flashscore_repository import FlashscoreRepository
 from config import DEFAULT_SEASON
 
 class FlashscoreMetaService:

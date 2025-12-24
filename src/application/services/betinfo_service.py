@@ -1,6 +1,6 @@
-from scraper.betinfo_page import BetinfoPage
-from parsers.betinfo_match_parser import BetinfoMatchParser
-from repository.betinfo_repository import BetinfoRepository
+from infrastructure.scraping.scrapers.betinfo_page import BetinfoPage
+from infrastructure.scraping.parsers.betinfo_match_parser import BetinfoMatchParser
+from infrastructure.repositories.betinfo_repository import BetinfoRepository
 from domain.models.match import Match
 
 

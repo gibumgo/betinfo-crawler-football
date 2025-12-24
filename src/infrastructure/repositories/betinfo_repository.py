@@ -2,7 +2,9 @@ import pandas as pd
 from domain.models.match import Match
 
 
-class BetinfoRepository:
+from domain.repositories.match_repository import MatchRepository
+
+class BetinfoRepository(MatchRepository):
     COLUMN_MAP = {
         "round": "회차",
         "game_number": "경기번호",

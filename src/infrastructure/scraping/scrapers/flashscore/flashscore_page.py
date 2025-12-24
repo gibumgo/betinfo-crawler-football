@@ -2,7 +2,7 @@ import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from scraper.base_scraper import BaseScraper
+from infrastructure.scraping.scrapers.base_scraper import BaseScraper
 import time
 import random
 from config import FLASHSCORE_BASE_URL

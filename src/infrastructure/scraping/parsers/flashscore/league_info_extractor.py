@@ -2,7 +2,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from domain.models.league import League
 from domain.exceptions import ParsingException
-from parsers.flashscore.image_resource_extractor import ImageResourceExtractor
+from infrastructure.scraping.parsers.flashscore.image_resource_extractor import ImageResourceExtractor
 
 class LeagueInfoExtractor:
     @staticmethod

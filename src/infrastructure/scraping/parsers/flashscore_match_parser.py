@@ -1,8 +1,8 @@
 from datetime import datetime
 from selenium.webdriver.common.by import By
 from domain.models.flashscore_match import FlashscoreMatch
-from parsers.flashscore.round_extractor import RoundExtractor
-from parsers.flashscore.match_extractor import MatchExtractor
+from infrastructure.scraping.parsers.flashscore.round_extractor import RoundExtractor
+from infrastructure.scraping.parsers.flashscore.match_extractor import MatchExtractor
 from config import DEFAULT_SEASON
 
 
