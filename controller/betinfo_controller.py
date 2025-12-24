@@ -10,17 +10,17 @@ class BetinfoController:
         self.repository = CSVRepository()
 
     def start_collection(self):
-        print("\n[Betinfo 수집 설정]")
+        self.view.display_betinfo_settings()
         start_round = input("➡️ 시작 회차: ").strip()
         end_round = input("➡️ 종료 회차: ").strip()
         
         if not (start_round.isdigit() and end_round.isdigit()):
-            self.view.display_status("회차는 숫자만 입력 가능합니다.", "error")
+            self.view.display_invalid_round_input()
             return
 
         driver = None
         try:
-            self.view.display_status("브라우저를 초기화 중입니다...", "working")
+            self.view.display_browser_initializing()
             driver = ChromeDriverFactory.create()
             
             page = BetinfoPage(driver)
@@ -28,13 +28,14 @@ class BetinfoController:
             
             for round_num in range(int(start_round), int(end_round) + 1):
                 round_val = str(round_num)
-                self.view.display_status(f"{round_val} 회차 처리 중...", "working")
+                self.view.display_processing_round(round_val)
                 service.collect_round(round_val)
                 
-            self.view.display_status("모든 회차 수집이 완료되었습니다.", "success")
+            self.view.display_all_rounds_complete()
             
         except Exception as e:
-            self.view.display_status(f"Betinfo 수집 중 오류: {e}", "error")
+            self.view.display_betinfo_collection_error(e)
         finally:
             if driver:
                 driver.quit()
+

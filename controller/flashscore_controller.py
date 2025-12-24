@@ -24,14 +24,14 @@ class FlashscoreController:
                 self._collect_metadata()
                 break
             else:
-                self.view.display_status("잘못된 입력입니다. 다시 선택해주세요.", "warning")
+                self.view.display_invalid_choice()
     
     def _collect_match_data(self):
         params = self.view.get_collection_params()
         
         driver = None
         try:
-            self.view.display_status("브라우저를 초기화 중입니다...", "working")
+            self.view.display_browser_initializing()
             driver = ChromeDriverFactory.create()
             
             page = FlashscorePage(driver)
@@ -50,26 +50,26 @@ class FlashscoreController:
             )
             
             self.view.display_match_collection_result(result)
-            self.view.display_status("데이터 저장 및 후처리가 완료되었습니다.", "success")
+            self.view.display_match_data_complete()
             
         except Exception as e:
-            self.view.display_status(f"수집 작업 중 오류 발생: {e}", "error")
+            self.view.display_match_collection_error(e)
             
         finally:
             if driver:
                 driver.quit()
-                self.view.display_status("브라우저 세션이 종료되었습니다.", "info")
+                self.view.display_browser_closed()
     
     def _collect_metadata(self):
         params = self.view.get_metadata_params()
         
         if not params:
-            self.view.display_status("메타데이터 수집이 취소되었습니다.", "warning")
+            self.view.display_metadata_collection_canceled()
             return
         
         driver = None
         try:
-            self.view.display_status("브라우저를 초기화 중입니다...", "working")
+            self.view.display_browser_initializing()
             driver = ChromeDriverFactory.create()
             
             meta_service = FlashscoreMetaService(driver, self.repository)
@@ -81,7 +81,7 @@ class FlashscoreController:
                 params["season"]
             )
             
-            self.view.display_status("🔗 순위표 페이지로 이동 중...", "working")
+            self.view.display_navigating_to_standings()
             
             result = meta_service.collect_metadata(
                 nation=params["nation"],
@@ -91,19 +91,19 @@ class FlashscoreController:
             )
             
             if result['success']:
-                self.view.display_status("✅ 순위표 페이지 로딩 완료", "success")
-                self.view.display_status("🔍 메타데이터 파싱 중...", "working")
-                self.view.display_status("💾 데이터 저장 중...", "working")
+                self.view.display_standings_loaded()
+                self.view.display_parsing_metadata()
+                self.view.display_saving_data()
             
             self.view.display_metadata_collection_result(result)
             
         except Exception as e:
-            self.view.display_status(f"메타데이터 수집 중 오류 발생: {e}", "error")
+            self.view.display_metadata_collection_error(e)
             import traceback
             traceback.print_exc()
             
         finally:
             if driver:
                 driver.quit()
-                self.view.display_status("브라우저 세션이 종료되었습니다.", "info")
+                self.view.display_browser_closed()
 
