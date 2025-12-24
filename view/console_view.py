@@ -1,129 +1,99 @@
-import os
+from view.menu_view import MenuView
+from view.input_view import InputView
+from view.flashscore_match_message_view import FlashscoreMatchMessageView
+from view.flashscore_meta_message_view import FlashscoreMetaMessageView
+from view.betinfo_message_view import BetinfoMessageView
+from view.common_message_view import CommonMessageView
 
 class ConsoleView:
-    @staticmethod
-    def display_welcome():
-        os.system('cls' if os.name == 'nt' else 'clear')
-        print("=" * 60)
-        print("        🚀 FOOTBALL DATA COLLECTION SYSTEM")
-        print("=" * 60)
-        print("1. 벳인포 (Betinfo.co.kr) 수집")
-        print("2. 플래시스코어 (Flashscore) 수집")
-        print("Q. 프로그램 종료")
-        print("-" * 60)
-
-    @staticmethod
-    def get_site_choice():
-        choice = input("👉 원하시는 작업의 번호를 입력하세요: ").strip().upper()
-        return choice
-
-    @staticmethod
-    def display_status(message: str, type: str = "info"):
-        icons = {"info": "ℹ️", "success": "✅", "error": "❌", "warning": "⚠️", "working": "🔄"}
-        icon = icons.get(type, "•")
-        print(f"{icon} {message}")
-
-    @staticmethod
-    def display_flashscore_menu():
-        print("\n" + "=" * 60)
-        print("        📊 FLASHSCORE 데이터 수집")
-        print("=" * 60)
-        print("1. 경기 데이터 수집 (Match Data)")
-        print("2. 메타데이터 수집 (League & Team Metadata)")
-        print("B. 뒤로 가기")
-        print("-" * 60)
+    def __init__(self):
+        self.menu = MenuView()
+        self.input = InputView()
+        self.flashscore_match_msg = FlashscoreMatchMessageView()
+        self.flashscore_meta_msg = FlashscoreMetaMessageView()
+        self.betinfo_msg = BetinfoMessageView()
+        self.common_msg = CommonMessageView()
     
-    @staticmethod
-    def get_flashscore_choice():
-        choice = input("👉 원하시는 작업의 번호를 입력하세요: ").strip().upper()
-        return choice
-
-    @staticmethod
-    def get_collection_params():
-        print("-" * 60)
-        print("📍 리그 경로 (예: /soccer/england/premier-league/)")
-        league_path = input("👉 입력: ").strip() or "/soccer/england/premier-league/"
-        
-        season = input("📅 시즌 (예: 2025-2026) [엔터: 2025-2026]: ").strip() or "2025-2026"
-        
-        print("\n[옵션] 특정 라운드 범위 수집 (엔터 입력 시 최신 라운드만)")
-        start_round = input("➡️ 시작 라운드: ").strip()
-        end_round = input("➡️ 종료 라운드: ").strip()
-        
-        return {
-            "league_path": league_path,
-            "season": season,
-            "start_round": int(start_round) if start_round.isdigit() else None,
-            "end_round": int(end_round) if end_round.isdigit() else None
-        }
+    def display_welcome(self):
+        self.menu.display_welcome()
     
-    @staticmethod
-    def get_metadata_params():
-        print("-" * 60)
-        print("📍 메타데이터 수집 정보 입력")
-        print("-" * 60)
-        
-        nation = input("🌍 국가명 (예: england): ").strip() or "england"
-        
-        league_name = input("🏆 리그명 (예: premier-league): ").strip() or "premier-league"
-        
-        print("\n💡 리그 ID는 순위표 URL에서 확인할 수 있습니다.")
-        print("   예: https://www.flashscore.co.kr/soccer/england/premier-league/standings/#/OEEq9Yvp/standings/overall/")
-        print("   → 리그 ID: OEEq9Yvp")
-        league_id = input("🔑 리그 ID: ").strip()
-        
-        if not league_id:
-            print("⚠️ 리그 ID는 필수 입력값입니다.")
-            return None
-        
-        season = input("📅 시즌 (예: 2025-2026) [엔터: 2025-2026]: ").strip() or "2025-2026"
-        
-        return {
-            "nation": nation,
-            "league_name": league_name,
-            "league_id": league_id,
-            "season": season
-        }
-
-    @staticmethod
-    def display_completion(match_count: int, filename: str):
-        print("\n" + "=" * 60)
-        print(f"🎉 수집 작업이 완료되었습니다!")
-        print(f"📊 총 수집 경기 수: {match_count}개")
-        print(f"💾 저장 파일명: {filename}")
-        print("=" * 60 + "\n")
-
-    @staticmethod
-    def display_match_collection_start(season: str, league_path: str):
-        print(f"\n🕒 경기 결과 수집 시작 ({season}): {league_path}")
+    def get_site_choice(self):
+        return self.menu.get_site_choice()
     
-    @staticmethod
-    def display_match_collection_result(result: dict):
-        if result['match_count'] > 0:
-            print(f"💾 경기 결과 저장 완료: {result['filename']} ({result['match_count']}개)")
-        else:
-            print("⚠️ 수집된 경기 데이터가 없습니다. 라운드 범위나 페이지 상태를 확인하세요.")
+    def display_flashscore_menu(self):
+        self.menu.display_flashscore_menu()
     
-    @staticmethod
-    def display_loading_round(target_round: int):
-        print(f"🔍 {target_round} 라운드 데이터를 찾는 중...")
+    def get_flashscore_choice(self):
+        return self.menu.get_flashscore_choice()
     
-    @staticmethod
-    def display_metadata_collection_start(nation: str, league_name: str, league_id: str, season: str):
-        print(f"\n{'='*60}")
-        print(f"🏆 메타데이터 수집 시작")
-        print(f"📍 국가: {nation}, 리그: {league_name}, ID: {league_id}")
-        print(f"📅 시즌: {season}")
-        print(f"{'='*60}\n")
+    def display_betinfo_settings(self):
+        self.menu.display_betinfo_settings()
     
-    @staticmethod
-    def display_metadata_collection_result(result: dict):
-        if result['success']:
-            print(f"\n{'='*60}")
-            print("🎉 메타데이터 수집 완료!")
-            print(f"📊 리그: 1개")
-            print(f"📊 팀: {result['team_count']}개")
-            print(f"📊 리그-팀 관계: {result['relation_count']}개")
-            print(f"{'='*60}\n")
-        else:
-            print(f"❌ {result.get('error', '알 수 없는 오류')}")
+    def get_collection_params(self):
+        return self.input.get_collection_params()
+    
+    def get_metadata_params(self):
+        return self.input.get_metadata_params()
+    
+    def display_match_collection_start(self, season: str, league_path: str):
+        self.flashscore_match_msg.display_collection_start(season, league_path)
+    
+    def display_match_collection_result(self, result: dict):
+        self.flashscore_match_msg.display_collection_result(result)
+    
+    def display_loading_round(self, target_round: int):
+        self.flashscore_match_msg.display_loading_round(target_round)
+    
+    def display_match_data_complete(self):
+        self.flashscore_match_msg.display_data_complete()
+    
+    def display_match_collection_error(self, error):
+        self.flashscore_match_msg.display_collection_error(error)
+    
+    def display_metadata_collection_start(self, nation: str, league_name: str, league_id: str, season: str):
+        self.flashscore_meta_msg.display_collection_start(nation, league_name, league_id, season)
+    
+    def display_metadata_collection_result(self, result: dict):
+        self.flashscore_meta_msg.display_collection_result(result)
+    
+    def display_metadata_collection_canceled(self):
+        self.flashscore_meta_msg.display_collection_canceled()
+    
+    def display_navigating_to_standings(self):
+        self.flashscore_meta_msg.display_navigating_to_standings()
+    
+    def display_standings_loaded(self):
+        self.flashscore_meta_msg.display_standings_loaded()
+    
+    def display_parsing_metadata(self):
+        self.flashscore_meta_msg.display_parsing()
+    
+    def display_saving_data(self):
+        self.flashscore_meta_msg.display_saving()
+    
+    def display_metadata_collection_error(self, error):
+        self.flashscore_meta_msg.display_collection_error(error)
+    
+    def display_invalid_round_input(self):
+        self.betinfo_msg.display_invalid_round_input()
+    
+    def display_processing_round(self, round_val: str):
+        self.betinfo_msg.display_processing_round(round_val)
+    
+    def display_all_rounds_complete(self):
+        self.betinfo_msg.display_all_complete()
+    
+    def display_betinfo_collection_error(self, error):
+        self.betinfo_msg.display_collection_error(error)
+    
+    def display_browser_initializing(self):
+        self.common_msg.display_browser_initializing()
+    
+    def display_browser_closed(self):
+        self.common_msg.display_browser_closed()
+    
+    def display_invalid_choice(self):
+        self.common_msg.display_invalid_choice()
+    
+    def display_status(self, message: str, type: str = "info"):
+        self.common_msg.display_status(message, type)
