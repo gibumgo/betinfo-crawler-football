@@ -1,4 +1,6 @@
 from scraper.base_scraper import BaseScraper
+import time
+import random
 
 class FlashscorePage(BaseScraper):
     BASE_URL = "https://www.flashscore.co.kr"
@@ -17,3 +19,9 @@ class FlashscorePage(BaseScraper):
         full_url = f"{self.BASE_URL}{path}/fixtures/"
         self.open_url(full_url)
         self.wait_for_element(".event__match")
+    
+    def goto_standings(self, nation: str, league_name: str, league_id: str):
+        url = f"{self.BASE_URL}/soccer/{nation}/{league_name}/standings/#/{league_id}/standings/overall/"
+        self.driver.get(url)
+        time.sleep(random.uniform(2, 4))
+        self.wait_for_element("div.ui-table__body", timeout=10)
