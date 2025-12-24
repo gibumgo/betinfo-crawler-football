@@ -1,4 +1,5 @@
 import re
+import config
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from domain.exceptions import ParsingException
@@ -37,11 +38,11 @@ class ImageResourceExtractor:
             if url_match:
                 relative_url = url_match.group(1)
                 if relative_url.startswith('/'):
-                    return f"https://static.flashscore.com{relative_url}"
+                    return f"{config.FLASHSCORE_IMAGE_URL}{relative_url}"
                 elif relative_url.startswith('http'):
-                    return relative_url
+                     return relative_url
                 else:
-                    return f"https://static.flashscore.com/{relative_url}"
+                    return f"{config.FLASHSCORE_IMAGE_URL}/{relative_url}"
             
             raise ParsingException("CSS backgroundImage에서 URL 추출 실패")
             

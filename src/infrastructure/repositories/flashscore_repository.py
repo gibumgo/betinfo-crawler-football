@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import config
 from domain.models.flashscore_match import FlashscoreMatch
 from domain.models.league import League
 from domain.models.team import Team
@@ -17,16 +18,16 @@ class FlashscoreRepository:
         print(f"✅ {len(matches)} matches saved to {filename}")
 
     def save_leagues(self, leagues: list[League]):
-        filename = "data/leagues.csv"
+        filename = config.LEAGUES_FILENAME
         self._append_to_csv_safe(filename, leagues)
 
 
     def save_teams(self, teams: list[Team], nation: str):
-        filename = "data/teams.csv"
+        filename = config.TEAMS_FILENAME
         self._append_to_csv_safe(filename, teams)
 
     def save_league_teams(self, league_teams: list[LeagueTeam]):
-        filename = "data/league_teams.csv"
+        filename = config.LEAGUE_TEAMS_FILENAME
         self._append_to_csv_safe(filename, league_teams)
 
     def _append_to_csv_safe(self, filename: str, items: list):

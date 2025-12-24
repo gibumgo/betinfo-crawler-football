@@ -1,9 +1,10 @@
 import time
+import config
 from selenium.webdriver.common.by import By
 from infrastructure.scraping.scrapers.base_scraper import BaseScraper
 
 class BetinfoPage(BaseScraper):
-    URL = "https://www.betinfo.co.kr/z_protorate/protoRate2.asp"
+    URL = config.BETINFO_MATCH_URL
 
     def open(self):
         self.open_url(self.URL)
