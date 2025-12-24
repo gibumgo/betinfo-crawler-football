@@ -1,34 +1,34 @@
-from dataclasses import dataclass
+from pydantic import BaseModel, Field, field_validator
+from typing import Optional
 
-@dataclass(frozen=True)
-class Match:
-    round: str
-    game_number: str
-    datetime: str
-    league: str
-    home: str
-    away: str
-    game_type: str
+class Match(BaseModel):
+    round: str = Field(default="")
+    game_number: str = Field(default="")
+    datetime: str = Field(default="")
+    league: str = Field(default="")
+    home: str = Field(default="")
+    away: str = Field(default="")
+    game_type: str = Field(default="")
 
-    win_domestic: str
-    draw_domestic: str
-    lose_domestic: str
+    win_domestic: str = Field(default="")
+    draw_domestic: str = Field(default="")
+    lose_domestic: str = Field(default="")
 
-    init_win_domestic: str
-    init_draw_domestic: str
-    init_lose_domestic: str
+    init_win_domestic: str = Field(default="")
+    init_draw_domestic: str = Field(default="")
+    init_lose_domestic: str = Field(default="")
 
-    win_foreign: str
-    draw_foreign: str
-    lose_foreign: str
+    win_foreign: str = Field(default="")
+    draw_foreign: str = Field(default="")
+    lose_foreign: str = Field(default="")
 
-    init_win_foreign: str
-    init_draw_foreign: str
-    init_lose_foreign: str
+    init_win_foreign: str = Field(default="")
+    init_draw_foreign: str = Field(default="")
+    init_lose_foreign: str = Field(default="")
 
-    score: str
-    result: str
-    result_odds: str
+    score: str = Field(default="")
+    result: str = Field(default="")
+    result_odds: str = Field(default="")
 
     @classmethod
     def of(cls, data: dict, round_val: str):
@@ -40,27 +40,27 @@ class Match:
         lose = data.get("lose_domestic", "")
         
         return cls(
-            round=round_val,
-            game_number=data.get("game_number", ""),
-            datetime=data.get("datetime", ""),
-            league=data.get("league", ""),
-            home=data.get("home", ""),
-            away=data.get("away", ""),
-            game_type=data.get("game_type", ""),
-            win_domestic=win,
-            draw_domestic=draw,
-            lose_domestic=lose,
-            init_win_domestic=data.get("init_win_domestic", ""),
-            init_draw_domestic=data.get("init_draw_domestic", ""),
-            init_lose_domestic=data.get("init_lose_domestic", ""),
-            win_foreign=data.get("win_foreign", ""),
-            draw_foreign=data.get("draw_foreign", ""),
-            lose_foreign=data.get("lose_foreign", ""),
-            init_win_foreign=data.get("init_win_foreign", ""),
-            init_draw_foreign=data.get("init_draw_foreign", ""),
-            init_lose_foreign=data.get("init_lose_foreign", ""),
-            score=data.get("score", ""),
-            result=result,
-            result_odds=OddsPolicy.calculate_result_odds(result, win, draw, lose)
+            round=str(round_val),
+            game_number=str(data.get("game_number", "")),
+            datetime=str(data.get("datetime", "")),
+            league=str(data.get("league", "")),
+            home=str(data.get("home", "")),
+            away=str(data.get("away", "")),
+            game_type=str(data.get("game_type", "")),
+            win_domestic=str(win),
+            draw_domestic=str(draw),
+            lose_domestic=str(lose),
+            init_win_domestic=str(data.get("init_win_domestic", "")),
+            init_draw_domestic=str(data.get("init_draw_domestic", "")),
+            init_lose_domestic=str(data.get("init_lose_domestic", "")),
+            win_foreign=str(data.get("win_foreign", "")),
+            draw_foreign=str(data.get("draw_foreign", "")),
+            lose_foreign=str(data.get("lose_foreign", "")),
+            init_win_foreign=str(data.get("init_win_foreign", "")),
+            init_draw_foreign=str(data.get("init_draw_foreign", "")),
+            init_lose_foreign=str(data.get("init_lose_foreign", "")),
+            score=str(data.get("score", "")),
+            result=str(result),
+            result_odds=str(OddsPolicy.calculate_result_odds(result, win, draw, lose))
         )
 
