@@ -1,7 +1,7 @@
-from infrastructure.repositories.base_repository import BaseRepository
+from infrastructure.repositories.csv_repository import CsvRepository
 from domain.models.league import League
 
-class LeagueRepository(BaseRepository):
+class LeagueRepository(CsvRepository):
     COLUMN_MAP = {
         "league_id": "리그ID",
         "nation": "국가",
@@ -13,8 +13,5 @@ class LeagueRepository(BaseRepository):
         "current_season": "시즌"
     }
     
-    def __init__(self):
-        super().__init__(self.COLUMN_MAP)
-    
     def save(self, leagues: list[League], filename: str = "league.csv") -> None:
-        self.save_to_csv(leagues, filename)
+        self.save_to_csv(leagues, filename, column_map=self.COLUMN_MAP, append=True, deduplicate=True)

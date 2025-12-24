@@ -1,7 +1,7 @@
-from infrastructure.repositories.base_repository import BaseRepository
+from infrastructure.repositories.csv_repository import CsvRepository
 from domain.models.team import Team
 
-class TeamRepository(BaseRepository):
+class TeamRepository(CsvRepository):
     COLUMN_MAP = {
         "team_id": "팀ID",
         "team_name": "팀명",
@@ -9,9 +9,6 @@ class TeamRepository(BaseRepository):
         "team_image_url": "팀이미지URL",
         "nation": "국가"
     }
-    
-    def __init__(self):
-        super().__init__(self.COLUMN_MAP)
     
     def save(self, teams: list[Team], nation: str = None) -> None:
         if not teams:
@@ -22,4 +19,4 @@ class TeamRepository(BaseRepository):
             nation = teams[0].nation
         
         filename = f"data/{nation}-team.csv"
-        self.save_to_csv(teams, filename)
+        self.save_to_csv(teams, filename, column_map=self.COLUMN_MAP, append=True, deduplicate=True)

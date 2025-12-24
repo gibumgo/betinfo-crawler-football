@@ -1,10 +1,8 @@
-import pandas as pd
 from domain.models.match import Match
-
-
 from domain.repositories.match_repository import MatchRepository
+from infrastructure.repositories.csv_repository import CsvRepository
 
-class BetinfoRepository(MatchRepository):
+class BetinfoRepository(MatchRepository, CsvRepository):
     COLUMN_MAP = {
         "round": "회차",
         "game_number": "경기번호",
@@ -36,10 +34,4 @@ class BetinfoRepository(MatchRepository):
     }
 
     def save(self, filename: str, matches: list[Match]) -> None:
-        match_data_rows = [
-            {self.COLUMN_MAP[field]: value for field, value in match.model_dump().items()}
-            for match in matches
-        ]
-
-        matches_dataframe = pd.DataFrame(match_data_rows)
-        matches_dataframe.to_csv(filename, index=False, encoding="utf-8-sig")
+        self.save_to_csv(matches, filename, column_map=self.COLUMN_MAP)
