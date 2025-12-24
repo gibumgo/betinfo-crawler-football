@@ -2,7 +2,12 @@ import pandas as pd
 from dataclasses import asdict
 from datetime import datetime
 from domain.models.flashscore_match import FlashscoreMatch
+from domain.models.league import League
 from domain.models.team import Team
+from domain.models.league_team import LeagueTeam
+from repository.league_repository import LeagueRepository
+from repository.team_repository import TeamRepository
+from repository.league_team_repository import LeagueTeamRepository
 
 class FlashscoreRepository:
     MATCH_COLUMN_MAP = {
@@ -22,22 +27,13 @@ class FlashscoreRepository:
         "flashscore_match_id": "경기ID"
     }
 
-    TEAM_COLUMN_MAP = {
-        "id": "시스템ID",
-        "league_id": "리그ID",
-        "name_ko": "팀명(한)",
-        "name_en": "팀명(영)",
-        "flashscore_id": "플래시스코어ID",
-        "logo_url": "로고URL",
-        "stadium_ko": "경기장(한)",
-        "stadium_en": "경기장(영)"
-    }
+    def __init__(self):
+        self.league_repo = LeagueRepository()
+        self.team_repo = TeamRepository()
+        self.league_team_repo = LeagueTeamRepository()
 
     def save_matches(self, filename: str, match_list: list[FlashscoreMatch]) -> None:
         self._save_to_csv(match_list, self.MATCH_COLUMN_MAP, filename)
-
-    def save_teams(self, filename: str, team_list: list[Team]) -> None:
-        self._save_to_csv(team_list, self.TEAM_COLUMN_MAP, filename)
 
     def save(self, filename: str, match_list: list[FlashscoreMatch]) -> None:
         self.save_matches(filename, match_list)
@@ -47,7 +43,6 @@ class FlashscoreRepository:
         for item in items:
             data_dict = asdict(item)
             
-            # 날짜형 데이터가 있을 경우 문자열로 변환
             for key, value in data_dict.items():
                 if isinstance(value, datetime):
                     data_dict[key] = value.strftime("%Y-%m-%d %H:%M")
@@ -57,3 +52,13 @@ class FlashscoreRepository:
 
         dataframe = pd.DataFrame(csv_rows)
         dataframe.to_csv(filename, index=False, encoding="utf-8-sig")
+
+    def save_leagues(self, leagues: list[League], filename: str = "league.csv") -> None:
+        self.league_repo.save(leagues, filename)
+    
+    def save_teams(self, teams: list[Team], nation: str = None) -> None:
+        self.team_repo.save(teams, nation)
+    
+    def save_league_teams(self, league_teams: list[LeagueTeam], filename: str = "league_team.csv") -> None:
+        self.league_team_repo.save(league_teams, filename)
+
