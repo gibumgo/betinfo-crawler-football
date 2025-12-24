@@ -6,9 +6,10 @@ from service.flashscore_meta_service import FlashscoreMetaService
 from view.console_view import ConsoleView
 
 class FlashscoreController:
-    def __init__(self):
-        self.view = ConsoleView()
-        self.repository = FlashscoreRepository()
+    def __init__(self, view: ConsoleView, repository: FlashscoreRepository, error_handler):
+        self.view = view
+        self.repository = repository
+        self.error_handler = error_handler
 
     def start_collection(self):
         while True:
@@ -18,10 +19,10 @@ class FlashscoreController:
             if choice == 'B':
                 return
             elif choice == '1':
-                self._collect_match_data()
+                self.error_handler.execute(self._collect_match_data)
                 break
             elif choice == '2':
-                self._collect_metadata()
+                self.error_handler.execute(self._collect_metadata)
                 break
             else:
                 self.view.display_invalid_choice()
@@ -51,9 +52,6 @@ class FlashscoreController:
             
             self.view.display_match_collection_result(result)
             self.view.display_match_data_complete()
-            
-        except Exception as e:
-            self.view.display_match_collection_error(e)
             
         finally:
             if driver:
@@ -96,11 +94,6 @@ class FlashscoreController:
                 self.view.display_saving_data()
             
             self.view.display_metadata_collection_result(result)
-            
-        except Exception as e:
-            self.view.display_metadata_collection_error(e)
-            import traceback
-            traceback.print_exc()
             
         finally:
             if driver:

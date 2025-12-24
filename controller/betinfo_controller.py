@@ -5,11 +5,15 @@ from service.betinfo_service import BetinfoService
 from view.console_view import ConsoleView
 
 class BetinfoController:
-    def __init__(self):
-        self.view = ConsoleView()
-        self.repository = BetinfoRepository()
+    def __init__(self, view: ConsoleView, repository: BetinfoRepository, error_handler):
+        self.view = view
+        self.repository = repository
+        self.error_handler = error_handler
 
     def start_collection(self):
+        self.error_handler.execute(self._process_collection)
+
+    def _process_collection(self):
         self.view.display_betinfo_settings()
         start_round = input("➡️ 시작 회차: ").strip()
         end_round = input("➡️ 종료 회차: ").strip()
@@ -33,8 +37,6 @@ class BetinfoController:
                 
             self.view.display_all_rounds_complete()
             
-        except Exception as e:
-            self.view.display_betinfo_collection_error(e)
         finally:
             if driver:
                 driver.quit()

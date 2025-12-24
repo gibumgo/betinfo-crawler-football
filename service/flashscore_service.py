@@ -1,8 +1,7 @@
-import time
-import random
 from scraper.flashscore.flashscore_page import FlashscorePage
 from parsers.flashscore_match_parser import MatchParser
 from repository.flashscore_repository import FlashscoreRepository
+from config import DEFAULT_SEASON
 
 class FlashscoreService:
     def __init__(self, page: FlashscorePage, repository: FlashscoreRepository):
@@ -15,22 +14,12 @@ class FlashscoreService:
         league = parts[2] if len(parts) > 2 else "unknown"
         return nation.replace("-", "_"), league.replace("-", "_")
 
-    def collect_matches_data(self, league_path: str, season: str = "2025-2026", start_round: int = None, end_round: int = None):
-        league_path = league_path.strip()
-        if not league_path.startswith('/'):
-            league_path = '/' + league_path
-        league_path = league_path.rstrip('/')
-
-        if season and season != "2025-2026" and f"-{season}" not in league_path:
-            league_path = f"{league_path}-{season}"
+    def collect_matches_data(self, league_path: str, season: str = DEFAULT_SEASON, start_round: int = None, end_round: int = None):
+        self.page.open_league_url(league_path, season)
         
-        league_path += "/"
-        
-        self.page.goto_match_results(league_path)
-        time.sleep(random.uniform(2, 4))
-        
+        self.page.wait_for_page_load()
         if start_round is not None:
-            self._load_more_until_round(start_round)
+             self._load_more_until_round(start_round)
         
         matches = MatchParser.parse_matches(
             self.page.driver, 

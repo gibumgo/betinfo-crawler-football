@@ -1,11 +1,13 @@
+from config import DEFAULT_LEAGUE_PATH, DEFAULT_SEASON, DEFAULT_NATION, DEFAULT_LEAGUE_NAME
+
 class InputView:
     @staticmethod
     def get_collection_params():
         print("-" * 60)
-        print("📍 리그 경로 (예: /soccer/england/premier-league/)")
-        league_path = input("👉 입력: ").strip() or "/soccer/england/premier-league/"
+        print(f"📍 리그 경로 (예: {DEFAULT_LEAGUE_PATH})")
+        league_path = input("👉 입력: ").strip() or DEFAULT_LEAGUE_PATH
         
-        season = input("📅 시즌 (예: 2025-2026) [엔터: 2025-2026]: ").strip() or "2025-2026"
+        season = input(f"📅 시즌 (예: {DEFAULT_SEASON}) [엔터: {DEFAULT_SEASON}]: ").strip() or DEFAULT_SEASON
         
         print("\n[옵션] 특정 라운드 범위 수집 (엔터 입력 시 최신 라운드만)")
         start_round = input("➡️ 시작 라운드: ").strip()
@@ -24,12 +26,12 @@ class InputView:
         print("📍 메타데이터 수집 정보 입력")
         print("-" * 60)
         
-        nation = input("🌍 국가명 (예: england): ").strip() or "england"
+        nation = input(f"🌍 국가명 (예: {DEFAULT_NATION}): ").strip() or DEFAULT_NATION
         
-        league_name = input("🏆 리그명 (예: premier-league): ").strip() or "premier-league"
+        league_name = input(f"🏆 리그명 (예: {DEFAULT_LEAGUE_NAME}): ").strip() or DEFAULT_LEAGUE_NAME
         
         print("\n💡 리그 ID는 순위표 URL에서 확인할 수 있습니다.")
-        print("   예: https://www.flashscore.co.kr/soccer/england/premier-league/standings/#/OEEq9Yvp/standings/overall/")
+        print(f"   예: https://www.flashscore.co.kr/soccer/{DEFAULT_NATION}/{DEFAULT_LEAGUE_NAME}/standings/#/OEEq9Yvp/standings/overall/")
         print("   → 리그 ID: OEEq9Yvp")
         league_id = input("🔑 리그 ID: ").strip()
         
@@ -37,7 +39,7 @@ class InputView:
             print("⚠️ 리그 ID는 필수 입력값입니다.")
             return None
         
-        season = input("📅 시즌 (예: 2025-2026) [엔터: 2025-2026]: ").strip() or "2025-2026"
+        season = input(f"📅 시즌 (예: {DEFAULT_SEASON}) [엔터: {DEFAULT_SEASON}]: ").strip() or DEFAULT_SEASON
         
         return {
             "nation": nation,

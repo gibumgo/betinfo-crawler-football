@@ -1,9 +1,14 @@
+import datetime
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from scraper.base_scraper import BaseScraper
 import time
 import random
+from config import FLASHSCORE_BASE_URL
 
 class FlashscorePage(BaseScraper):
-    BASE_URL = "https://www.flashscore.co.kr"
+    BASE_URL = FLASHSCORE_BASE_URL
 
     def open(self):
         self.open_url(self.BASE_URL)
