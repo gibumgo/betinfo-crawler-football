@@ -1,14 +1,24 @@
 from controller.betinfo_controller import BetinfoController
 from controller.flashscore_controller import FlashscoreController
 from view.console_view import ConsoleView
+from repository.betinfo_repository import BetinfoRepository
+from repository.flashscore_repository import FlashscoreRepository
+from util.error_handler import ErrorHandler
 import time
 
 def main():
     view = ConsoleView()
+    error_handler = ErrorHandler(view)
+    
+    betinfo_repo = BetinfoRepository()
+    flashscore_repo = FlashscoreRepository()
+    
+    betinfo_controller = BetinfoController(view, betinfo_repo, error_handler)
+    flashscore_controller = FlashscoreController(view, flashscore_repo, error_handler)
     
     SITE_CONTROLLERS = {
-        '1': BetinfoController,
-        '2': FlashscoreController
+        '1': betinfo_controller,
+        '2': flashscore_controller
     }
 
     while True:
@@ -19,10 +29,9 @@ def main():
             view.display_status("프로그램을 종료합니다. 감사합니다!", "info")
             break
 
-        controller_class = SITE_CONTROLLERS.get(choice)
+        controller = SITE_CONTROLLERS.get(choice)
         
-        if controller_class:
-            controller = controller_class()
+        if controller:
             controller.start_collection()
             input("\n메뉴로 돌아가려면 엔터를 누르세요...")
         else:
