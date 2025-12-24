@@ -1,5 +1,4 @@
 import pandas as pd
-from dataclasses import asdict
 from domain.models.match import Match
 
 
@@ -35,10 +34,10 @@ class BetinfoRepository:
     }
 
     def save(self, filename: str, matches: list[Match]) -> None:
-        rows = [
-            {self.COLUMN_MAP[k]: v for k, v in asdict(match).items()}
+        match_data_rows = [
+            {self.COLUMN_MAP[field]: value for field, value in match.model_dump().items()}
             for match in matches
         ]
 
-        df = pd.DataFrame(rows)
-        df.to_csv(filename, index=False, encoding="utf-8-sig")
+        matches_dataframe = pd.DataFrame(match_data_rows)
+        matches_dataframe.to_csv(filename, index=False, encoding="utf-8-sig")
