@@ -9,7 +9,6 @@ class BaseScraper(ABC):
         self.update_driver(driver)
 
     def update_driver(self, driver):
-        """드라이버 세션 재시작 시 내부 참조를 최신화합니다."""
         self.driver = driver
         self.wait = WebDriverWait(self.driver, 20)
 
@@ -29,7 +28,6 @@ class BaseScraper(ABC):
             raise Exception(f"요소를 찾을 수 없습니다: {css_selector}")
 
     def click_show_more(self, selector: str = ".event__more") -> bool:
-        """'더 보기' 버튼을 찾아 클릭합니다."""
         try:
             button = WebDriverWait(self.driver, 5).until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, selector))
