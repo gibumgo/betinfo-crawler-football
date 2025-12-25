@@ -18,8 +18,7 @@ class FlashscoreService:
         parts = [p for p in league_path.split("/") if p]
         return parts[2] if len(parts) > 2 else "unknown"
 
-    def collect_matches_data(self, league_path: str, league_id: str, season: str = DEFAULT_SEASON, start_round: int = None, end_round: int = None):
-        # open_league_url -> open_results_page 로 변경
+    def collect_matches_data(self, league_path: str, league_name: str, season: str = DEFAULT_SEASON, start_round: int = None, end_round: int = None):
         self.page.open_results_page(league_path, season)
         
         self.page.wait_for_page_load()
@@ -32,7 +31,7 @@ class FlashscoreService:
         
         matches = MatchParser.parse_matches(
             html_content, 
-            league_id=league_id, 
+            league_name=league_name, 
             season=season,
             start_round=start_round,
             end_round=end_round

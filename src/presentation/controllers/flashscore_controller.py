@@ -49,7 +49,7 @@ class FlashscoreController:
             
             result = service.collect_matches_data(
                 league_path=params["league_path"],
-                league_id=params["league_id"],
+                league_name=params["league_name"],
                 season=params["season"],
                 start_round=params["start_round"],
                 end_round=params["end_round"]

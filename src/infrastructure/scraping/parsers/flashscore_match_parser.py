@@ -13,7 +13,7 @@ class MatchParser:
     DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
     @staticmethod
-    def parse_matches(html_content, league_id, season=DEFAULT_SEASON, start_round=None, end_round=None):
+    def parse_matches(html_content, league_name, season=DEFAULT_SEASON, start_round=None, end_round=None):
         parsed_matches = []
         soup = BeautifulSoup(html_content, 'lxml')
         match_rows = soup.select(MatchParser.CSS_MATCH_ROWS)
@@ -37,7 +37,7 @@ class MatchParser:
                     continue
 
                 if MatchParser.CLASS_EVENT_MATCH in class_names:
-                    match_obj = MatchParser._process_match_row(row, league_id, season, start_round, end_round, parsing_state)
+                    match_obj = MatchParser._process_match_row(row, league_name, season, start_round, end_round, parsing_state)
                     if match_obj:
                         parsing_state["match_count"] += 1
                         parsed_matches.append(match_obj)
@@ -48,7 +48,7 @@ class MatchParser:
         return parsed_matches
 
     @staticmethod
-    def _process_match_row(row, league_id, season, start_round, end_round, parsing_state):
+    def _process_match_row(row, league_name, season, start_round, end_round, parsing_state):
         current_round = parsing_state["round_num"]
         
         if start_round is not None and current_round < start_round: return None
@@ -65,7 +65,7 @@ class MatchParser:
 
             return FlashscoreMatch.create(
                 id=parsing_state["match_count"] + 1,
-                league_id=league_id,
+                league_name=league_name,
                 home_team_name=teams[0],
                 away_team_name=teams[1],
                 url_team1_name_en=url_info["t1_slug"],

@@ -4,7 +4,7 @@ import re
 
 class FlashscoreMatch(BaseModel):
     id: str = Field(default="")
-    league_id: str = Field(default="")
+    league_name: str = Field(default="")
     home_team_name: str = Field(default="")
     away_team_name: str = Field(default="")
     url_team1_name_en: str = Field(default="")
@@ -36,7 +36,7 @@ class FlashscoreMatch(BaseModel):
         """파서에서 사용하는 명시적 생성 메서드"""
         data = {
             "id": str(kwargs.get("id", "")),
-            "league_id": str(kwargs.get("league_id", "")),
+            "league_name": str(kwargs.get("league_name", "")),
             "home_team_name": kwargs.get("home_team_name", ""),
             "away_team_name": kwargs.get("away_team_name", ""),
             "url_team1_name_en": kwargs.get("url_team1_name_en", ""),
@@ -56,7 +56,7 @@ class FlashscoreMatch(BaseModel):
     def of(cls, raw_data: dict):
         return cls(
             id=str(raw_data.get("id", "")),
-            league_id=str(raw_data.get("league_id", "")),
+            league_name=str(raw_data.get("league_name", "")),
             home_team_name=raw_data.get("home", ""),
             away_team_name=raw_data.get("away", ""),
             url_team1_name_en=raw_data.get("url_info", {}).get("t1_slug", ""),

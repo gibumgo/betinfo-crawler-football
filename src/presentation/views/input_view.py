@@ -7,14 +7,13 @@ class InputView:
         print(f"📍 리그 경로 (예: {DEFAULT_LEAGUE_PATH})")
         league_path = input("👉 입력: ").strip() or DEFAULT_LEAGUE_PATH
         
-        print("\n💡 리그 ID는 순위표 URL에서 확인할 수 있습니다.")
-        print(f"   예: https://www.flashscore.co.kr/soccer/england/premier-league/#/OEEq9Yvp/standings/overall/")
-        print("   → 리그 ID: OEEq9Yvp")
-        league_id = input("🔑 리그 ID: ").strip()
-        
-        if not league_id:
-            print("⚠️ 리그 ID는 필수 입력값입니다.")
-            return None
+        parts = [p for p in league_path.split('/') if p]
+        if len(parts) >= 3:
+            league_name = parts[2]
+        else:
+            league_name = "unknown_league"
+
+        print(f"🔑 추출된 리그 이름: {league_name}")
         
         season = input(f"📅 시즌 (예: {DEFAULT_SEASON}) [엔터: {DEFAULT_SEASON}]: ").strip() or DEFAULT_SEASON
         
@@ -24,7 +23,7 @@ class InputView:
         
         return {
             "league_path": league_path,
-            "league_id": league_id,
+            "league_name": league_name,
             "season": season,
             "start_round": int(start_round) if start_round.isdigit() else None,
             "end_round": int(end_round) if end_round.isdigit() else None
