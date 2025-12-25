@@ -5,8 +5,8 @@ from bs4 import Tag
 class MatchExtractor:
     CSS_TIME = ".event__time"
     CSS_PARTICIPANTS = ".event__participant"
-    CSS_HOME_PARTICIPANT_NAME = ".event__homeParticipant .wcl-name_jjfMf"
-    CSS_AWAY_PARTICIPANT_NAME = ".event__awayParticipant .wcl-name_jjfMf"
+    CSS_HOME_PARTICIPANT_NAME = ".event__homeParticipant [class*='wcl-name_']"
+    CSS_AWAY_PARTICIPANT_NAME = ".event__awayParticipant [class*='wcl-name_']"
     CSS_HOME_PARTICIPANT = ".event__homeParticipant"
     CSS_AWAY_PARTICIPANT = ".event__awayParticipant"
     

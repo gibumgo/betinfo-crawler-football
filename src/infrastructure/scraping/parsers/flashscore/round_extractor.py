@@ -1,27 +1,19 @@
-from domain.models.flashscore_match import FlashscoreMatch
+import re
 from bs4 import Tag
-
 
 class RoundExtractor:
     KEYWORD_ROUND_KR = "라운드"
     KEYWORD_ROUND_EN = "Round"
     
     @staticmethod
-    def extract_info(row: Tag, start_round, detected_latest_round):
+    def extract_info(row: Tag, start_round: int, detected_latest_round: int):
         round_text = row.get_text(strip=True)
         
-        if RoundExtractor.KEYWORD_ROUND_KR in round_text:
-            try:
-                current_round_number = int(round_text.replace(RoundExtractor.KEYWORD_ROUND_KR, "").strip())
-            except ValueError:
-                return 0, detected_latest_round, False
-        elif RoundExtractor.KEYWORD_ROUND_EN in round_text:
-            try:
-                current_round_number = int(round_text.replace(RoundExtractor.KEYWORD_ROUND_EN, "").strip())
-            except ValueError:
-                return 0, detected_latest_round, False
-        else:
+        match = re.search(r'(\d+)', round_text)
+        if not match:
             return 0, detected_latest_round, False
+            
+        current_round_number = int(match.group(1))
 
         should_stop = False
         if start_round is None:
@@ -31,4 +23,3 @@ class RoundExtractor:
                  should_stop = True
                  
         return current_round_number, detected_latest_round, should_stop
-

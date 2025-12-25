@@ -19,10 +19,13 @@ class FlashscoreService:
         return parts[2] if len(parts) > 2 else "unknown"
 
     def collect_matches_data(self, league_path: str, league_id: str, season: str = DEFAULT_SEASON, start_round: int = None, end_round: int = None):
-        self.page.open_league_url(league_path, season)
+        # open_league_url -> open_results_page 로 변경
+        self.page.open_results_page(league_path, season)
         
         self.page.wait_for_page_load()
+        
         if start_round is not None:
+             print(f"🔍 {start_round} 라운드 데이터를 찾는 중...")
              self._load_more_until_round(start_round)
         
         html_content = self.page.get_page_source()
@@ -40,6 +43,8 @@ class FlashscoreService:
             safe_nation, safe_league = self._get_safe_filename_parts(league_path)
             filename = f"flashscore_matches_{safe_nation}_{safe_league}_{season}.csv"
             self.repository.save_matches(filename, matches)
+        else:
+            print("⚠️ 수집된 경기 데이터가 없습니다. 라운드 범위나 페이지 상태를 확인하세요.")
         
         return {
             'matches': matches,
@@ -48,12 +53,32 @@ class FlashscoreService:
         }
 
     def _load_more_until_round(self, target_round: int):
-        max_attempts = 20
-        for _ in range(max_attempts):
-            html = self.page.driver.page_source
-            if f"{target_round} 라운드" in html or f"Round {target_round}" in html:
+        from bs4 import BeautifulSoup
+        import re
+        
+        max_attempts = 50
+        
+        for i in range(max_attempts):
+            html = self.page.get_page_source()
+            soup = BeautifulSoup(html, 'lxml')
+            
+            round_headers = soup.select(".event__round")
+            found = False
+            
+            for header in round_headers:
+                header_text = header.get_text(strip=True)
+                match = re.search(r'(\d+)', header_text)
+                if match:
+                    r_num = int(match.group(1))
+                    if r_num == target_round:
+                        print(f"✅ {target_round} 라운드 헤더 발견: '{header_text}'")
+                        found = True
+                        break
+                
+            if found:
                 break
             
-            if not self.page.click_show_more():
-                break
-
+            if i < max_attempts - 1:
+                print(f"🔄 더 많은 경기 로딩 중... ({i+1}/{max_attempts})")
+                if not self.page.click_show_more():
+                    break

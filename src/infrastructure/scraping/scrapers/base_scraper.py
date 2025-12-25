@@ -27,16 +27,21 @@ class BaseScraper(ABC):
         except Exception:
             raise Exception(f"요소를 찾을 수 없습니다: {css_selector}")
 
-    def click_show_more(self, selector: str = ".event__more") -> bool:
-        try:
-            button = WebDriverWait(self.driver, 5).until(
-                EC.element_to_be_clickable((By.CSS_SELECTOR, selector))
-            )
-            self.driver.execute_script("arguments[0].click();", button)
-            time.sleep(1.5)
-            return True
-        except:
-            return False
+    def click_show_more(self) -> bool:
+        selectors = [".event__more", "a.wcl-buttonLink_jmSkY", "[data-testid='wcl-buttonLink']"]
+        
+        for selector in selectors:
+            try:
+                button = WebDriverWait(self.driver, 3).until(
+                    EC.element_to_be_clickable((By.CSS_SELECTOR, selector))
+                )
+                if "더 많은" in button.text or "Show more" in button.text:
+                    self.driver.execute_script("arguments[0].click();", button)
+                    time.sleep(2.0)
+                    return True
+            except:
+                continue
+        return False
 
     def get_page_source(self) -> str:
         return self.driver.page_source

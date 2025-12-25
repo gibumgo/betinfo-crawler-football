@@ -49,29 +49,35 @@ class MatchParser:
 
     @staticmethod
     def _process_match_row(row, league_id, season, start_round, end_round, parsing_state):
-        if start_round is not None and parsing_state["round_num"] < start_round: return None
-        if end_round is not None and parsing_state["round_num"] > end_round: return None
+        current_round = parsing_state["round_num"]
+        
+        if start_round is not None and current_round < start_round: return None
+        if end_round is not None and current_round > end_round: return None
+            
+        try:
+            match_datetime = MatchExtractor.extract_datetime(row, parsing_state["year"])
+            teams = MatchExtractor.extract_teams(row)
+            scores = MatchExtractor.extract_scores(row)
+            url_info = MatchExtractor.extract_url_info(row)
+            
+            if not teams[0] or not teams[1]:
+                return None
 
-        match_datetime = MatchExtractor.extract_datetime(row, parsing_state["year"])
-        teams = MatchExtractor.extract_teams(row)
-        scores = MatchExtractor.extract_scores(row)
-        url_info = MatchExtractor.extract_url_info(row)
-
-        return FlashscoreMatch.create(
-            id=parsing_state["match_count"] + 1,
-            league_id=league_id,
-            home_team_name=teams[0],
-            away_team_name=teams[1],
-            url_team1_name_en=url_info["t1_slug"],
-            url_team2_name_en=url_info["t2_slug"],
-            url_team1_id=url_info["t1_id"],
-            url_team2_id=url_info["t2_id"],
-            match_datetime=match_datetime.strftime(MatchParser.DATE_FORMAT),
-            round=parsing_state["round_num"],
-            season=season,
-            home_score=scores[0],
-            away_score=scores[1],
-            flashscore_match_id=url_info["match_id"]
-        )
-
-
+            return FlashscoreMatch.create(
+                id=parsing_state["match_count"] + 1,
+                league_id=league_id,
+                home_team_name=teams[0],
+                away_team_name=teams[1],
+                url_team1_name_en=url_info["t1_slug"],
+                url_team2_name_en=url_info["t2_slug"],
+                url_team1_id=url_info["t1_id"],
+                url_team2_id=url_info["t2_id"],
+                match_datetime=match_datetime.strftime(MatchParser.DATE_FORMAT),
+                round=current_round,
+                season=season,
+                home_score=scores[0],
+                away_score=scores[1],
+                flashscore_match_id=url_info["match_id"]
+            )
+        except Exception:
+            return None
