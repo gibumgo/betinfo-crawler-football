@@ -1,4 +1,4 @@
-from selenium.webdriver.common.by import By
+from bs4 import Tag
 from infrastructure.scraping.parsers.game_type_strategies.game_type_strategy_factory import GameTypeStrategyFactory
 from infrastructure.scraping.parsers.odds_strategies.initial_odds_strategy import InitialOddsStrategy
 from infrastructure.scraping.parsers.odds_strategies.current_odds_strategy import CurrentOddsStrategy
@@ -9,8 +9,8 @@ class BetinfoMatchParser:
         self.initial_odds_parser = InitialOddsStrategy()
         self.current_odds_parser = CurrentOddsStrategy()
     
-    def parse_row(self, row) -> dict:
-        tds = row.find_elements(By.TAG_NAME, "td")
+    def parse_row(self, row: Tag) -> dict:
+        tds = row.find_all("td")
         
         if len(tds) < 21:
             return None
@@ -19,16 +19,16 @@ class BetinfoMatchParser:
         game_type_strategy = GameTypeStrategyFactory.create_strategy(game_type_img)
         
         game_type = game_type_strategy.identify_type_name()
-        handicap_value = tds[7].text.strip() if tds[7].text.strip() else None
+        handicap_value = tds[7].get_text(strip=True) if tds[7].get_text(strip=True) else None
         result_data = game_type_strategy.parse_result(tds[20])
         
         return {
-            "game_number": tds[0].text.strip(),
-            "datetime": tds[1].text.strip(),
-            "league": tds[2].text.strip(),
-            "home": tds[4].text.strip(),
+            "game_number": tds[0].get_text(strip=True),
+            "datetime": tds[1].get_text(strip=True),
+            "league": tds[2].get_text(strip=True),
+            "home": tds[4].get_text(strip=True),
             "game_type": game_type,
-            "away": tds[6].text.strip(),
+            "away": tds[6].get_text(strip=True),
             "handicap_value": handicap_value,
             
             "init_win_foreign": self.initial_odds_parser.parse(tds[10]),
@@ -49,11 +49,11 @@ class BetinfoMatchParser:
             "score": result_data.get("score"),
         }
     
-    def _extract_image_source(self, td_element) -> str:
+    def _extract_image_source(self, td_element: Tag) -> str:
         try:
-            img_elements = td_element.find_elements(By.TAG_NAME, "img")
+            img_elements = td_element.find_all("img")
             if img_elements:
-                return img_elements[0].get_attribute("src")
+                return img_elements[0].get("src", "")
         except Exception:
             pass
         return ""

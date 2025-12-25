@@ -1,28 +1,37 @@
 import re
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
+from bs4 import BeautifulSoup
 from domain.models.team import Team
 from domain.exceptions import ParsingException
 
 class TeamListExtractor:
     @staticmethod
-    def extract(driver, nation: str):
+    def extract(html_content: str, nation: str):
         teams = []
         errors = []
         
         try:
-            table_body = driver.find_element(
-                By.CSS_SELECTOR,
+            soup = BeautifulSoup(html_content, 'lxml')
+            
+            table_body = soup.select_one(
                 "#tournament-table-tabs-and-content > div:nth-child(3) > div:nth-child(1) > div > div > div.ui-table__body"
             )
             
-            rows = table_body.find_elements(By.CSS_SELECTOR, "div.ui-table__row")
+            if not table_body:
+                errors.append(ParsingException(
+                    message="팀 테이블 본문을 찾을 수 없음"
+                ))
+                return teams, errors
+            
+            rows = table_body.select("div.ui-table__row")
             
             for row in rows:
                 try:
-                    team_link = row.find_element(By.CSS_SELECTOR, "a.tableCellParticipant__name")
-                    team_name_ko = team_link.text.strip()
-                    href = team_link.get_attribute("href")
+                    team_link = row.select_one("a.tableCellParticipant__name")
+                    if not team_link:
+                        continue
+                        
+                    team_name_ko = team_link.get_text(strip=True)
+                    href = team_link.get("href", "")
                     
                     match = re.search(r'/team/([^/]+)/([^/]+)/', href)
                     if not match:
@@ -37,12 +46,10 @@ class TeamListExtractor:
                     
                     team_image_url = ""
                     try:
-                        team_img = row.find_element(
-                            By.CSS_SELECTOR, 
-                            "a.tableCellParticipant__image > img"
-                        )
-                        team_image_url = team_img.get_attribute("src")
-                    except NoSuchElementException:
+                        team_img = row.select_one("a.tableCellParticipant__image > img")
+                        if team_img:
+                            team_image_url = team_img.get("src", "")
+                    except Exception:
                         pass
                     
                     team = Team.create(
@@ -58,7 +65,7 @@ class TeamListExtractor:
                     errors.append(ParsingException(
                         message="팀 정보 추출 중 오류 (개별 로우)",
                         original_exception=e,
-                        context={'row_text': row.text[:30] if row else 'N/A'}
+                        context={'row_text': row.get_text()[:30] if row else 'N/A'}
                     ))
                     continue
             

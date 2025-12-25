@@ -1,4 +1,5 @@
 from domain.models.flashscore_match import FlashscoreMatch
+from bs4 import Tag
 
 
 class RoundExtractor:
@@ -6,8 +7,8 @@ class RoundExtractor:
     KEYWORD_ROUND_EN = "Round"
     
     @staticmethod
-    def extract_info(row, start_round, detected_latest_round):
-        round_text = row.text.strip()
+    def extract_info(row: Tag, start_round, detected_latest_round):
+        round_text = row.get_text(strip=True)
         
         if RoundExtractor.KEYWORD_ROUND_KR in round_text:
             try:

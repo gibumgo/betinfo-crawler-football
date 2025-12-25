@@ -1,5 +1,5 @@
 from datetime import datetime
-from selenium.webdriver.common.by import By
+from bs4 import BeautifulSoup
 from domain.models.flashscore_match import FlashscoreMatch
 from infrastructure.scraping.parsers.flashscore.round_extractor import RoundExtractor
 from infrastructure.scraping.parsers.flashscore.match_extractor import MatchExtractor
@@ -13,9 +13,10 @@ class MatchParser:
     DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
     @staticmethod
-    def parse_matches(driver, league_id, season=DEFAULT_SEASON, start_round=None, end_round=None):
+    def parse_matches(html_content, league_id, season=DEFAULT_SEASON, start_round=None, end_round=None):
         parsed_matches = []
-        match_rows = driver.find_elements(By.CSS_SELECTOR, MatchParser.CSS_MATCH_ROWS)
+        soup = BeautifulSoup(html_content, 'lxml')
+        match_rows = soup.select(MatchParser.CSS_MATCH_ROWS)
         
         parsing_state = {
             "round_num": 0,
@@ -26,7 +27,7 @@ class MatchParser:
 
         for row in match_rows:
             try:
-                class_names = row.get_attribute("class")
+                class_names = row.get("class", [])
 
                 if MatchParser.CLASS_EVENT_ROUND in class_names:
                     parsing_state["round_num"], parsing_state["detected_latest"], stop = RoundExtractor.extract_info(

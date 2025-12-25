@@ -30,6 +30,10 @@ class FlashscoreController:
     def _collect_match_data(self):
         params = self.view.get_collection_params()
         
+        if not params:
+            self.view.display_status("매치 데이터 수집이 취소되었습니다.", "warning")
+            return
+        
         driver = None
         try:
             self.view.display_browser_initializing()
@@ -45,6 +49,7 @@ class FlashscoreController:
             
             result = service.collect_matches_data(
                 league_path=params["league_path"],
+                league_id=params["league_id"],
                 season=params["season"],
                 start_round=params["start_round"],
                 end_round=params["end_round"]

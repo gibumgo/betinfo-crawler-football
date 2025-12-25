@@ -18,8 +18,10 @@ class FlashscoreMetaService:
     ):
         self.page.goto_standings(nation, league_name, league_id)
         
+        html_content = self.page.get_page_source()
+        
         metadata = LeagueMetaParser.parse_metadata(
-            self.driver, 
+            html_content, 
             league_id, 
             nation, 
             league_name, 

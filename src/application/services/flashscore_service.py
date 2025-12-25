@@ -13,17 +13,23 @@ class FlashscoreService:
         nation = parts[1] if len(parts) > 1 else "unknown"
         league = parts[2] if len(parts) > 2 else "unknown"
         return nation.replace("-", "_"), league.replace("-", "_")
+    
+    def _extract_league_id(self, league_path: str):
+        parts = [p for p in league_path.split("/") if p]
+        return parts[2] if len(parts) > 2 else "unknown"
 
-    def collect_matches_data(self, league_path: str, season: str = DEFAULT_SEASON, start_round: int = None, end_round: int = None):
+    def collect_matches_data(self, league_path: str, league_id: str, season: str = DEFAULT_SEASON, start_round: int = None, end_round: int = None):
         self.page.open_league_url(league_path, season)
         
         self.page.wait_for_page_load()
         if start_round is not None:
              self._load_more_until_round(start_round)
         
+        html_content = self.page.get_page_source()
+        
         matches = MatchParser.parse_matches(
-            self.page.driver, 
-            league_id=1, 
+            html_content, 
+            league_id=league_id, 
             season=season,
             start_round=start_round,
             end_round=end_round

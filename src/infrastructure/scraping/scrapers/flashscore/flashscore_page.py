@@ -12,6 +12,14 @@ class FlashscorePage(BaseScraper):
 
     def open(self):
         self.open_url(self.BASE_URL)
+    
+    def open_league_url(self, league_url_path: str, season: str = None):
+        path = league_url_path.rstrip('/')
+        full_url = f"{self.BASE_URL}{path}/results/"
+        self.open_url(full_url)
+    
+    def wait_for_page_load(self):
+        self.wait_for_element(".event__match")
 
     def goto_match_results(self, league_url_path: str):
         path = league_url_path.rstrip('/')
@@ -30,3 +38,4 @@ class FlashscorePage(BaseScraper):
         self.driver.get(url)
         time.sleep(random.uniform(2, 4))
         self.wait_for_element("div.ui-table__body", timeout=10)
+

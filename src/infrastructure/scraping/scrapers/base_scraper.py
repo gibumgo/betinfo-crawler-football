@@ -37,3 +37,6 @@ class BaseScraper(ABC):
             return True
         except:
             return False
+
+    def get_page_source(self) -> str:
+        return self.driver.page_source

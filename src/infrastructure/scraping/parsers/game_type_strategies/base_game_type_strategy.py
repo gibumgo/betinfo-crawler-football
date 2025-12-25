@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Dict
+from bs4 import Tag
 
 
 class BaseGameTypeStrategy(ABC):
@@ -12,5 +13,5 @@ class BaseGameTypeStrategy(ABC):
         pass
     
     @abstractmethod
-    def parse_result(self, td_element) -> Dict[str, str]:
+    def parse_result(self, td_element: Tag) -> Dict[str, str]:
         pass

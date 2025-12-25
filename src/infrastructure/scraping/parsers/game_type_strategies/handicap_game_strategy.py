@@ -1,4 +1,5 @@
 from typing import Dict
+from bs4 import Tag
 from .base_game_type_strategy import BaseGameTypeStrategy
 
 
@@ -9,13 +10,12 @@ class HandicapGameStrategy(BaseGameTypeStrategy):
     def identify_type_name(self) -> str:
         return "핸디캡"
     
-    def parse_result(self, td_element) -> Dict[str, str]:
+    def parse_result(self, td_element: Tag) -> Dict[str, str]:
         try:
-            text = td_element.text.strip()
-            lines = text.split('\n')
+            strings = list(td_element.stripped_strings)
             
-            result = lines[0].strip() if lines else ""
-            score = lines[1].strip() if len(lines) > 1 else ""
+            result = strings[0] if strings else ""
+            score = strings[1] if len(strings) > 1 else ""
             
             return {
                 "result": result,

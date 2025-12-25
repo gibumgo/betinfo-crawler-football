@@ -1,7 +1,6 @@
 import re
 from datetime import datetime
-from selenium.webdriver.common.by import By
-
+from bs4 import Tag
 
 class MatchExtractor:
     CSS_TIME = ".event__time"
@@ -20,8 +19,13 @@ class MatchExtractor:
     DATE_FORMAT_PARSE = "%Y.%d.%m. %H:%M"
     
     @staticmethod
-    def extract_datetime(match_row, year):
-        time_text = match_row.find_element(By.CSS_SELECTOR, MatchExtractor.CSS_TIME).text.strip()
+    def extract_datetime(match_row: Tag, year: int):
+        element = match_row.select_one(MatchExtractor.CSS_TIME)
+        if not element:
+            return datetime.now()
+
+        time_text = element.get_text(strip=True)
+        time_text = time_text.strip('()')
         try:
             return datetime.strptime(f"{year}.{time_text}", MatchExtractor.DATE_FORMAT_PARSE)
         except Exception as error:
@@ -29,31 +33,39 @@ class MatchExtractor:
             return datetime.now()
 
     @staticmethod
-    def extract_teams(match_row):
+    def extract_teams(match_row: Tag):
         try:
-            home_team = match_row.find_element(By.CSS_SELECTOR, MatchExtractor.CSS_HOME_PARTICIPANT_NAME).text.strip()
-            away_team = match_row.find_element(By.CSS_SELECTOR, MatchExtractor.CSS_AWAY_PARTICIPANT_NAME).text.strip()
+            home_elem = match_row.select_one(MatchExtractor.CSS_HOME_PARTICIPANT_NAME)
+            away_elem = match_row.select_one(MatchExtractor.CSS_AWAY_PARTICIPANT_NAME)
+            
+            if not home_elem:
+                home_elem = match_row.select_one(MatchExtractor.CSS_HOME_PARTICIPANT)
+            if not away_elem:
+                away_elem = match_row.select_one(MatchExtractor.CSS_AWAY_PARTICIPANT)
+
+            home_team = home_elem.get_text(strip=True) if home_elem else ""
+            away_team = away_elem.get_text(strip=True) if away_elem else ""
             return home_team, away_team
         except:
-            try:
-                home_team = match_row.find_element(By.CSS_SELECTOR, MatchExtractor.CSS_HOME_PARTICIPANT).text.strip()
-                away_team = match_row.find_element(By.CSS_SELECTOR, MatchExtractor.CSS_AWAY_PARTICIPANT).text.strip()
-                return home_team, away_team
-            except:
-                return "", ""
+            return "", ""
 
     @staticmethod
-    def extract_scores(match_row):
+    def extract_scores(match_row: Tag):
         try:
-            home_score_text = match_row.find_element(By.CSS_SELECTOR, MatchExtractor.CSS_SCORE_HOME).text.strip()
-            away_score_text = match_row.find_element(By.CSS_SELECTOR, MatchExtractor.CSS_SCORE_AWAY).text.strip()
-            return int(home_score_text), int(away_score_text)
+            home_elem = match_row.select_one(MatchExtractor.CSS_SCORE_HOME)
+            away_elem = match_row.select_one(MatchExtractor.CSS_SCORE_AWAY)
+            
+            if home_elem and away_elem:
+                return int(home_elem.get_text(strip=True)), int(away_elem.get_text(strip=True))
+            return None, None
         except:
             return None, None
 
     @staticmethod
-    def extract_url_info(match_row):
-        link_element = match_row.find_element(By.CSS_SELECTOR, MatchExtractor.CSS_MATCH_LINK)
-        match_url = link_element.get_attribute("href")
-        from domain.models.flashscore_match import FlashscoreMatch
-        return FlashscoreMatch.extract_url_info(match_url)
+    def extract_url_info(match_row: Tag):
+        link_element = match_row.select_one(MatchExtractor.CSS_MATCH_LINK)
+        if link_element and link_element.has_attr("href"):
+            match_url = link_element["href"]
+            from domain.models.flashscore_match import FlashscoreMatch
+            return FlashscoreMatch.extract_url_info(match_url)
+        return {"t1_slug": "", "t2_slug": "", "t1_id": "", "t2_id": "", "match_id": ""}

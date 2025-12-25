@@ -1,6 +1,4 @@
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from bs4 import BeautifulSoup
 from domain.models.league_team import LeagueTeam
 from config import DEFAULT_SEASON
 from domain.exceptions import ParsingException
@@ -9,7 +7,7 @@ from infrastructure.scraping.parsers.flashscore.team_list_extractor import TeamL
 
 class LeagueMetaParser:  
     @staticmethod
-    def parse_metadata(driver, league_id: str, nation: str, league_name: str, season: str = DEFAULT_SEASON):
+    def parse_metadata(html_content: str, league_id: str, nation: str, league_name: str, season: str = DEFAULT_SEASON):
         result = {
             'league': None,
             'teams': [],
@@ -18,13 +16,18 @@ class LeagueMetaParser:
         }
         
         try:
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "div.container__heading"))
-            )
+            soup = BeautifulSoup(html_content, 'lxml')
+            
+            # Check if page is loaded
+            if not soup.select_one("div.container__heading"):
+                result['errors'].append(ParsingException(
+                    message="페이지가 제대로 로드되지 않음"
+                ))
+                return result
             
             try:
                 result['league'] = LeagueInfoExtractor.extract(
-                    driver, league_id, nation, league_name, season
+                    html_content, league_id, nation, league_name, season
                 )
             except Exception as e:
                 if isinstance(e, ParsingException):
@@ -37,7 +40,7 @@ class LeagueMetaParser:
                     ))
             
             try:
-                teams, team_errors = TeamListExtractor.extract(driver, nation)
+                teams, team_errors = TeamListExtractor.extract(html_content, nation)
                 result['teams'] = teams
                 result['errors'].extend(team_errors)
                 

@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from infrastructure.scraping.scrapers.betinfo_page import BetinfoPage
 from infrastructure.scraping.parsers.betinfo_match_parser import BetinfoMatchParser
 from infrastructure.repositories.betinfo_repository import BetinfoRepository
@@ -19,16 +20,19 @@ class BetinfoService:
         self.page.navigate_to_round(round_value)
         self.page.wait_until_table_loaded()
 
-        elements = self.page.extract_match_elements()
+        html_content = self.page.get_page_source()
+        soup = BeautifulSoup(html_content, 'lxml')
+        
+        match_rows = soup.select('#listView > tbody > tr[league_gubun="1"]')
         
         round_display = round_value
         if len(round_value) > 4:
             round_display = round_value[4:]
         
         matches = []
-        for element in elements:
+        for row in match_rows:
             try:
-                data_dict = self.parser.parse_row(element)
+                data_dict = self.parser.parse_row(row)
                 if data_dict:
                     match = Match.of(data_dict, round_display)
                     matches.append(match)
