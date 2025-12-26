@@ -1,0 +1,45 @@
+import time
+import config
+from selenium.webdriver.common.by import By
+from infrastructure.scraping.scrapers.base_scraper import BaseScraper
+
+class BetinfoPage(BaseScraper):
+    URL = config.BETINFO_MATCH_URL
+
+    def open(self):
+        self.open_url(self.URL)
+
+    def navigate_to_year(self, year_value: str):
+        year_selector = "#mainContent > div:nth-child(5) > span > form > table.searchTable > tbody > tr:nth-child(1) > td:nth-child(5) > select:nth-child(1)"
+        year_element = self.wait_for_element(year_selector)
+        
+        self.driver.execute_script(f"arguments[0].value='{year_value}';", year_element)
+        self.driver.execute_script("getyearround(arguments[0]);", year_element)
+        time.sleep(1.0)
+
+    def navigate_to_round(self, round_value: str):
+        round_element = self.wait_for_element("#YearRound")
+        
+        self.driver.execute_script(f"arguments[0].value='{round_value}';", round_element)
+        self.driver.execute_script("pr_number_onchange(arguments[0]);", round_element)
+        time.sleep(1.0)
+
+    def extract_match_elements(self):
+        return self.driver.find_elements(
+            By.CSS_SELECTOR, '#listView > tbody > tr[league_gubun="1"]'
+        )
+
+    def wait_until_table_loaded(self):
+        self.wait_for_element("#listView")
+
+    def get_available_rounds(self) -> list[str]:
+        round_element = self.wait_for_element("#YearRound")
+        options = round_element.find_elements(By.TAG_NAME, "option")
+        
+        rounds = []
+        for opt in options:
+            val = opt.get_attribute("value")
+            if val:
+                rounds.append(val)
+        
+        return rounds
