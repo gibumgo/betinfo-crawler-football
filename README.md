@@ -1,50 +1,118 @@
-# Betinfo Football Crawler (프로토 배당 수집기)
+# Football Data Crawler (Betinfo & Flashscore)
 
-## 프로젝트 소개
-본 프로젝트는 국내 스포츠 배당 사이트인 'Betinfo'에서 프로토(Proto) 경기 배당 데이터를 자동으로 수집하여 CSV 파일로 저장하는 Python 기반 크롤러입니다.
+**Football Data Crawler**는 국내 'Betinfo'와 글로벌 'Flashscore'의 축구 경기 데이터 및 배당률, 리그 메타데이터를 안정적으로 수집하기 위한 고성능 Python 크롤러입니다.
 
-## 개발 계기
-2025년도 2분기에 처음 제작했던 단일 파일 파이썬 크롤러에서 시작되었습니다. 지인의 요청으로 데이터를 더 효율적으로 관리하고 활용할 수 있도록 전체 구조를 재설계하였습니다. 
-특히 지인이 본인의 용도에 맞게 코드를 커스터마이징하거나 기능을 확장하기 편하도록, 각 역할을 **도메인(Domain), 파서(Parser), 스크래퍼(Scraper), 서비스(Service)** 등 역할별로 명확히 분리하여 구현하였습니다.
+최근 **Layered Architecture** 리팩토링을 통해 유지보수성을 극대화했으며, **Electron 애플리케이션 등 외부 프로세스와의 연동(IPC)**을 지원하는 강력한 CLI 인터페이스를 제공합니다.
 
-## 🚀 개발 히스토리
-| 단계 | 기간 | 핵심 작업 내용 | 비고 |
-| :--- | :--- | :--- | :--- |
-| **초기 프로토타입** | **1일** (25.04.13) | 전체 파싱 로직 구현 + CSV 저장 기능 완성 | 단일 파일로 빠르게 동작 확인 |
-| **아키텍처 재설계** | **2일** (25.12.15~16) | 전략 패턴 + 도메인 모델 구조 설계 | 유지보수성을 위한 기반 다지기 |
-| **구현 및 문서화** | **3일** (25.12.17~19) | 전면 리팩토링 + 상세 기술 문서 작성 | 코드 안정화와 기록 정리 |
+---
 
-## 프로젝트 깊게 읽기 (Technical Docs)
-프로젝트를 어떻게 만들었는지, 왜 그렇게 바꿨는지 궁금하시면 아래 글을 보세요.
-- [if-else 많던 코드 → 깔끔한 객체로 바꾼 이야기](./docs/refactoring-strategy-pattern-2025-12-17.md): 경기 종류마다 달랐던 코드를 객체로 나눠서 관리하기 쉽게 만든 과정과 그림
-- [크롤링으로 가져온 엉망 데이터 → 제대로 된 정보로 정리한 방법](./docs/data-mapping-and-domain-policy.md): 그냥 글자만 모으던 걸, 의미 있는 경기 정보로 바꾸는 설계 이야기
+## ✨ 주요 기능 (Features)
 
-## 실행 방법
-일반 사용자도 쉽게 실행할 수 있도록 설계되었습니다.
+- **이중 수집 모드**:
+  - **Betinfo**: 프로토(Proto) 회차별 배당률 및 경기 정보 수집
+  - **Flashscore**: 전 세계 축구 리그의 경기 결과, 순위표, 팀 정보 등 상세 메타데이터 수집
+- **하이브리드 파싱 아키텍처**:
+  - `Selenium`: 동적 페이지 렌더링 및 네비게이션
+  - `BeautifulSoup4`: 고속 정적 HTML 파싱 (기존 대비 속도 대폭 향상)
+- **강력한 CLI 및 IPC**:
+  - 자동화 파이프라인 구축을 위한 명령줄 인터페이스(CLI)
+  - 외부 GUI(Electron 등) 연동을 위한 표준화된 IPC 통신 규약 준수 (RFC-004)
+- **데이터 정합성**:
+  - 도메인 주도 설계(DDD)에 기반한 엄격한 데이터 모델링 (`Match`, `League`, `Team`)
+  - CSV 기반의 구조화된 데이터 저장
 
-1. **준비 사항**: 컴퓨터에 Python이 설치되어 있어야 하며, Chrome 브라우저가 필요합니다.
-2. **라이브러리 설치**: 터미널(또는 명령 프롬프트)에서 아래 명령어를 입력하여 필요한 라이브러리를 설치합니다.
-   ```bash
-   pip install pandas selenium webdriver-manager
-   ```
-3. **프로그램 실행**: `main.py` 파일을 실행합니다.
-   ```bash
-   python main.py
-   ```
-4. **회차 입력**: 프로그램이 실행되면 수집하고 싶은 '시작 회차'와 '끝 회차'를 숫자로 입력합니다. (예: 2025040)
-5. **결과 확인**: 실행이 완료되면 프로젝트 폴더 내에 `betinfo_proto_rate_회차번호.csv` 파일이 생성됩니다.
+---
 
-## 폴더 구조 설명
-- `domain/`: 프로젝트의 핵심 비즈니스 로직과 데이터 모델(`Match`)이 정의되어 있습니다.
-- `scraper/`: Selenium을 이용해 웹 페이지에 접속하고 요소를 탐색하는 역할을 담당합니다.
-- `parsers/`: 웹 페이지에서 추출한 데이터(HTML 요소)를 정제하여 유의미한 정보로 변환합니다. (전략 패턴 적용)
-- `repository/`: 정제된 데이터를 파일(`CSV`) 형태로 저장하는 역할을 합니다.
-- `service/`: 위 모든 구성 요소를 조율하여 실제 수집 프로세스를 실행합니다.
-- `driver/`: 크롬 드라이버 설정을 관리합니다.
+## 🛠️ 설치 방법 (Installation)
 
-## 도메인 설명
-- **Match (경기)**: 하나의 프로토 경기를 나타내는 핵심 모델입니다. 경기 번호, 리그, 팀명, 국내/해외 배당률, 경기 결과 등을 포함합니다.
-- **OddsPolicy (배당 정책)**: 경기 결과에 따른 배당률 계산 및 매칭 규칙을 정의합니다.
+### 전제 조건
+- Python 3.9 이상
+- Google Chrome 브라우저 설치
 
-## 이슈 및 개선 방향
-- **속도 이슈**: 현재 Selenium을 이용한 동적 파싱 방식을 사용하고 있어, 과거 단일 파일을 이용한 단순 스크래핑 방식보다 처리 속도가 다소 느린 편입니다. 향후 요청(Request) 기반의 비동기 처리나 멀티 프로세싱 도입을 통해 수집 속도를 개선할 계획입니다.
+### 1. 프로젝트 클론
+```bash
+git clone https://github.com/gibumgo/betinfo-crawler-football.git
+cd betinfo-crawler-football
+```
+
+### 2. 의존성 설치
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## 🚀 사용 방법 (Usage)
+
+본 프로그램은 **대화형 모드(Interactive)**와 **CLI 모드(Command Line Interface)** 두 가지 방식을 지원합니다.
+
+### 1. 대화형 모드 (Interactive Mode)
+초보자나 단발성 수집에 적합합니다. 메뉴를 선택하여 간편하게 실행할 수 있습니다.
+
+```bash
+python main.py
+```
+*실행 후 화면의 안내에 따라 1(Betinfo) 또는 2(Flashscore)를 선택하고 필요한 정보를 입력하세요.*
+
+### 2. CLI 모드 (Automation)
+스크립트나 외부 프로그램에서 호출할 때 사용합니다. `--mode` 옵션으로 수집 대상을 지정합니다.
+
+#### A. Betinfo 수집 (배당률)
+
+**최신 5개 회차 자동 수집:**
+```bash
+python main.py --mode=betinfo --recent=5 --headless
+```
+
+**특정 회차 범위 수집:**
+```bash
+python main.py --mode=betinfo --start-round=2025040 --end-round=2025050
+```
+
+#### B. Flashscore 수집 (경기 및 메타데이터)
+
+**리그/팀 메타데이터 수집:**
+순위표 URL을 입력하면 리그 정보와 소속 팀 정보를 자동으로 추출합니다.
+```bash
+python main.py --mode=flashscore --task=metadata --url="https://www.flashscore.co.kr/soccer/england/premier-league/standings/#/OEEq9Yvp/standings/overall/"
+```
+
+**경기 결과 수집 (시즌별):**
+과거 시즌 데이터를 수집할 때 유용합니다.
+```bash
+python main.py --mode=flashscore --task=matches \
+  --url="https://www.flashscore.co.kr/soccer/england/premier-league-2023-2024/results/" \
+  --season="2023-2024"
+```
+
+---
+
+## 🔌 IPC 연동 가이드 (For Developers)
+
+Electron 등 외부 프로세스에서 이 크롤러를 `subprocess`로 실행할 때, **표준 출력(stdout)**을 통해 진행 상황과 상태를 실시간으로 모니터링할 수 있습니다.
+
+**출력 메시지 예시:**
+```text
+STATUS:START|1735140000
+STATUS:MODE|betinfo
+STATUS:COLLECTING_ROUND|2025040
+PROGRESS:25
+DATA:{"match_id": "12345", "home_team": "Arsenal", ...}
+STATUS:COMPLETE|1735140500
+```
+*상세한 통신 규약은 [RFC-004 문서](./docs/rfc_004_process_integration.md)와 [CLI 매뉴얼](./docs/cli_사용_설명서.md)을 참고하세요.*
+
+---
+
+## 📂 프로젝트 구조
+
+- `src/domain/`: 비즈니스 로직 및 데이터 모델
+- `src/infrastructure/scraping/`: Selenium 및 BeautifulSoup 파싱 로직
+- `src/presentation/`: CLI 파서 및 컨트롤러
+- `docs/`: 상세 기술 문서 및 RFC
+
+---
+
+## 📝 라이선스
+
+This project is for educational and research purposes.
