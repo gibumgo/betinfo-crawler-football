@@ -31,3 +31,15 @@ class BetinfoPage(BaseScraper):
 
     def wait_until_table_loaded(self):
         self.wait_for_element("#listView")
+
+    def get_available_rounds(self) -> list[str]:
+        round_element = self.wait_for_element("#YearRound")
+        options = round_element.find_elements(By.TAG_NAME, "option")
+        
+        rounds = []
+        for opt in options:
+            val = opt.get_attribute("value")
+            if val:
+                rounds.append(val)
+        
+        return rounds
