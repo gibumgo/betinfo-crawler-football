@@ -21,7 +21,7 @@ class BetinfoService:
         self.page.wait_until_table_loaded()
 
         html_content = self.page.get_page_source()
-        soup = BeautifulSoup(html_content, 'lxml')
+        soup = BeautifulSoup(html_content, 'html.parser')
         
         match_rows = soup.select('#listView > tbody > tr[league_gubun="1"]')
         

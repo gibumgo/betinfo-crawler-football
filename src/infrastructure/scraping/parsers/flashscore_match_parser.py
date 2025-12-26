@@ -15,7 +15,7 @@ class MatchParser:
     @staticmethod
     def parse_matches(html_content, league_name, season=DEFAULT_SEASON, start_round=None, end_round=None):
         parsed_matches = []
-        soup = BeautifulSoup(html_content, 'lxml')
+        soup = BeautifulSoup(html_content, 'html.parser')
         match_rows = soup.select(MatchParser.CSS_MATCH_ROWS)
         
         parsing_state = {

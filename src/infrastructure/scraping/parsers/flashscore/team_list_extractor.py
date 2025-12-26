@@ -10,7 +10,7 @@ class TeamListExtractor:
         errors = []
         
         try:
-            soup = BeautifulSoup(html_content, 'lxml')
+            soup = BeautifulSoup(html_content, 'html.parser')
             
             table_body = soup.select_one(
                 "#tournament-table-tabs-and-content > div:nth-child(3) > div:nth-child(1) > div > div > div.ui-table__body"

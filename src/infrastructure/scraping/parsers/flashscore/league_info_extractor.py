@@ -9,7 +9,7 @@ class LeagueInfoExtractor:
         errors_context = {}
         
         try:
-            soup = BeautifulSoup(html_content, 'lxml')
+            soup = BeautifulSoup(html_content, 'html.parser')
             
             nation_ko = ""
             try:

@@ -16,7 +16,7 @@ class LeagueMetaParser:
         }
         
         try:
-            soup = BeautifulSoup(html_content, 'lxml')
+            soup = BeautifulSoup(html_content, 'html.parser')
             
             # Check if page is loaded
             if not soup.select_one("div.container__heading"):

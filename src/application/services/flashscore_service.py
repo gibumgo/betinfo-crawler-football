@@ -59,7 +59,7 @@ class FlashscoreService:
         
         for i in range(max_attempts):
             html = self.page.get_page_source()
-            soup = BeautifulSoup(html, 'lxml')
+            soup = BeautifulSoup(html, 'html.parser')
             
             round_headers = soup.select(".event__round")
             found = False
