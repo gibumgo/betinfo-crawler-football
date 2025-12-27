@@ -11,6 +11,8 @@ import config
 from infrastructure.mapping.team_name_matcher import TeamNameMatcher
 from shared.ipc_messenger import IPCMessenger
 
+from infrastructure.mapping.league_name_matcher import LeagueNameMatcher
+
 def main():
     print("🚀 Starting Team Mapping Tool...")
     print("--------------------------------")
@@ -20,16 +22,39 @@ def main():
         print(f"❌ No Betinfo CSV files found in {config.DIR_DATA_CRAWLED_BETINFO}")
         return
 
+    league_matcher = LeagueNameMatcher()
+    print("ℹ️ Loaded League Mappings. Only teams from mapped leagues will be processed.")
+
     unique_teams = set()
-    print(f"📂 Found {len(files)} Betinfo files. Scanning for teams...")
+    print(f"📂 Found {len(files)} Betinfo files. Scanning for teams in mapped leagues...")
     
     for f in files:
         try:
             df = pd.read_csv(f)
-            if '홈팀' in df.columns:
-                unique_teams.update(df['홈팀'].dropna().unique())
-            if '원정팀' in df.columns:
-                unique_teams.update(df['원정팀'].dropna().unique())
+            # Check for various column name possibilities
+            league_col = next((col for col in ['리그명', '리그', 'league', 'League', 'competition'] if col in df.columns), None)
+            home_col = next((col for col in ['홈', '홈팀', 'Home', 'home_team'] if col in df.columns), None)
+            away_col = next((col for col in ['원정', '원정팀', 'Away', 'away_team'] if col in df.columns), None)
+            
+            if not league_col or not (home_col or away_col):
+                continue
+                
+            # Iterate rows to check league mapping
+            for _, row in df.iterrows():
+                league_name = str(row[league_col]).strip()
+                # Check if this league is mapped (either in aliases or master dict)
+                league_id = league_matcher.get_id_by_alias(league_name)
+                
+                if league_id:
+                   # League is mapped, add teams
+                   if home_col and pd.notna(row[home_col]):
+                       unique_teams.update([str(row[home_col]).strip()])
+                   if away_col and pd.notna(row[away_col]):
+                       unique_teams.update([str(row[away_col]).strip()])
+                else:
+                    # League not mapped, skip teams
+                    pass
+
         except Exception as e:
             print(f"⚠️ Error reading {f}: {e}")
 

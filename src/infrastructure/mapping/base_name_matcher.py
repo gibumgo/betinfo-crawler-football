@@ -97,6 +97,19 @@ class BaseNameMatcher:
         if not a or not b: return 0.0
         return SequenceMatcher(None, a.lower(), b.lower()).ratio() * 100
 
+    def get_id_by_alias(self, alias: str) -> Optional[str]:
+        if not alias:
+            return None
+            
+        if alias in self.learned_mappings:
+            return self.learned_mappings[alias]
+            
+        for cand in self.search_candidates:
+            if cand['search_name'] == alias or cand.get('display') == alias:
+                return cand['id']
+                
+        return None
+
     def match(self, target_name: str, interactive: bool = True) -> Optional[str]:
         if target_name in self.learned_mappings:
             return self.learned_mappings[target_name]

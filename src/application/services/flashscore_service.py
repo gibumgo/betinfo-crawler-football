@@ -1,4 +1,3 @@
-```python
 from infrastructure.scraping.scrapers.flashscore.flashscore_page import FlashscorePage
 from infrastructure.scraping.parsers.flashscore_match_parser import MatchParser
 from infrastructure.repositories.flashscore_repository import FlashscoreRepository
@@ -16,6 +15,15 @@ class FlashscoreService:
     def _extract_league_id(self, league_path: str):
         parts = [p for p in league_path.split("/") if p]
         return parts[2] if len(parts) > 2 else "unknown"
+
+    def _get_safe_filename_parts(self, league_path: str):
+        parts = [p for p in league_path.split("/") if p]
+        if len(parts) >= 3:
+            # parts[1] is nation, parts[2] is league-name
+            nation = self._sanitize_filename(parts[1])
+            league = self._sanitize_filename(parts[2])
+            return nation, league
+        return "unknown", "unknown"
 
     def collect_matches_data(self, league_path: str, league_name: str, season: str = DEFAULT_SEASON, start_round: int = None, end_round: int = None):
         self.page.open_results_page(league_path, season)

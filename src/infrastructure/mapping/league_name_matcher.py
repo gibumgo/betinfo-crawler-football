@@ -11,7 +11,7 @@ class LeagueNameMatcher(BaseNameMatcher):
     def __init__(
         self, 
         leagues_csv_path: str = config.DEFAULT_LEAGUES_CSV_PATH,
-        mappings_json_path: str = config.DEFAULT_LEAGUE_MAPPING_JSON_PATH
+        mappings_json_path: str = config.DEFAULT_LEAGUE_ALIAS_JSON_PATH
     ):
         super().__init__(leagues_csv_path, mappings_json_path, "League")
 

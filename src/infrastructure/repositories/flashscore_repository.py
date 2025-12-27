@@ -11,10 +11,10 @@ class FlashscoreRepository(CsvRepository):
         self.save_to_csv(matches, filename)
 
     def save_leagues(self, leagues: list[League]):
-        self.save_to_csv(leagues, config.LEAGUES_FILENAME, append=True, deduplicate=True)
+        self.save_to_csv(leagues, config.DEFAULT_LEAGUES_CSV_PATH, append=True, deduplicate=True, deduplicate_subset=['league_id'])
 
     def save_teams(self, teams: list[Team], nation: str):
-        self.save_to_csv(teams, config.TEAMS_FILENAME, append=True, deduplicate=True)
+        self.save_to_csv(teams, config.DEFAULT_TEAMS_CSV_PATH, append=True, deduplicate=True, deduplicate_subset=['team_id'])
 
     def save_league_teams(self, league_teams: list[LeagueTeam]):
         self.save_to_csv(league_teams, config.LEAGUE_TEAMS_FILENAME, append=True, deduplicate=True)

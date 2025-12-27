@@ -10,6 +10,7 @@ class CsvRepository:
         filename: str, 
         append: bool = False, 
         deduplicate: bool = False, 
+        deduplicate_subset: Optional[List[str]] = None,
         column_map: Optional[dict] = None
     ) -> None:
         if not items:
@@ -20,7 +21,7 @@ class CsvRepository:
         self._ensure_directory(filename)
 
         if append and os.path.exists(filename):
-            self._save_append(new_df, filename, deduplicate)
+            self._save_append(new_df, filename, deduplicate, deduplicate_subset)
         else:
             self._save_overwrite(new_df, filename)
 
@@ -40,12 +41,12 @@ class CsvRepository:
         if directory:
             os.makedirs(directory, exist_ok=True)
 
-    def _save_append(self, new_df: pd.DataFrame, filename: str, deduplicate: bool) -> None:
+    def _save_append(self, new_df: pd.DataFrame, filename: str, deduplicate: bool, subset: Optional[List[str]] = None) -> None:
         existing_df = pd.read_csv(filename)
         combined_df = pd.concat([existing_df, new_df])
         
         if deduplicate:
-            combined_df.drop_duplicates(inplace=True)
+            combined_df.drop_duplicates(subset=subset, inplace=True, keep='last')
         
         combined_df.to_csv(filename, index=False, encoding="utf-8-sig")
         print(f"✅ [Append] Saved {len(new_df)} items to {filename} (Total: {len(combined_df)})")

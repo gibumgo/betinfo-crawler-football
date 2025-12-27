@@ -10,7 +10,7 @@ class TeamNameMatcher(BaseNameMatcher):
     def __init__(
         self, 
         teams_csv_path: str = config.DEFAULT_TEAMS_CSV_PATH,
-        mappings_json_path: str = config.DEFAULT_TEAM_MAPPING_JSON_PATH
+        mappings_json_path: str = config.DEFAULT_TEAM_ALIAS_JSON_PATH
     ):
         super().__init__(teams_csv_path, mappings_json_path, "Team")
 

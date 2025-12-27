@@ -21,7 +21,7 @@ def main():
     for f in files:
         try:
             df = pd.read_csv(f)
-            possible_cols = ['리그', 'league', 'League', 'competition']
+            possible_cols = ['리그명', '리그', 'league', 'League', 'competition']
             for col in possible_cols:
                 if col in df.columns:
                     unique_leagues.update(df[col].dropna().unique())

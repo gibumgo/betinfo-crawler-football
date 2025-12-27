@@ -6,7 +6,7 @@ from datetime import datetime
 from uuid import uuid4
 
 class HistoryManager:
-    def __init__(self, data_dir: str = config.DEFAULT_OUTPUT_DIR):
+    def __init__(self, data_dir: str = config.DIR_DATA):
         self.data_dir = data_dir
         self.history_file = os.path.join(data_dir, config.HISTORY_FILENAME)
         self._ensure_file()

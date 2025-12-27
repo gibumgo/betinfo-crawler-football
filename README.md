@@ -85,6 +85,20 @@ python main.py --mode=flashscore --task=matches \
   --season="2023-2024"
 ```
 
+### 3. 데이터 매핑 (Data Mapping)
+수집된 Betinfo 데이터(한글 팀/리그명)를 Flashscore의 표준 ID와 연결합니다.
+
+**팀명 매핑 실행:**
+```bash
+python tools/map_teams.py
+```
+
+**리그명 매핑 실행:**
+```bash
+python tools/map_leagues.py
+```
+*실행 시 자동으로 아직 매핑되지 않은 항목들을 찾아 대화형으로 매칭을 진행합니다.*
+
 ---
 
 ## 🔌 IPC 연동 가이드 (For Developers)

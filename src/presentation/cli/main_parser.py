@@ -37,7 +37,7 @@ class MainParser:
         self.parser.add_argument(ARG_HEADLESS, action="store_true", default=config.DRIVER_HEADLESS, help=HELP_HEADLESS.format(default=config.DRIVER_HEADLESS))
         self.parser.add_argument(ARG_NO_HEADLESS, action="store_false", dest="headless", help=HELP_NO_HEADLESS)
         
-        self.parser.add_argument(ARG_OUTPUT_DIR, type=str, default=config.DEFAULT_OUTPUT_DIR, help=HELP_OUTPUT_DIR.format(default=config.DEFAULT_OUTPUT_DIR))
+        self.parser.add_argument(ARG_OUTPUT_DIR, type=str, default=config.DIR_DATA, help=HELP_OUTPUT_DIR.format(default=config.DIR_DATA))
         self.parser.add_argument(ARG_TIMEOUT, type=int, default=config.DEFAULT_TIMEOUT, help=HELP_TIMEOUT.format(default=config.DEFAULT_TIMEOUT))
         self.parser.add_argument(ARG_DEBUG, action="store_true", help=HELP_DEBUG)
         self.parser.add_argument(ARG_CONFIG, type=str, help=HELP_CONFIG)
