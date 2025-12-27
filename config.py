@@ -41,3 +41,25 @@ MAX_HISTORY_RECORDS = 100
 FS_RESULTS_URL_TEMPLATE = "{base_url}/soccer/{nation}/{league}-{season}/results/"
 FS_SUMMARY_URL_TEMPLATE = "{base_url}/soccer/{nation}/{league}-{season}/standings/#/{league_id}/standings/overall/"
 
+# Mapping Thresholds
+THRESHOLD_AUTO_MATCH = 80
+THRESHOLD_CONFIRM_MATCH = 50
+
+# Data Directories
+DIR_DATA = DEFAULT_OUTPUT_DIR
+DIR_DATA_MASTER = f'{DIR_DATA}/master'
+DIR_DATA_MAPPINGS = f'{DIR_DATA}/mappings'
+DIR_DATA_CRAWLED_FLASHSCORE = f'{DIR_DATA}/crawled/flashscore'
+DIR_DATA_CRAWLED_BETINFO = f'{DIR_DATA}/crawled/betinfo'
+
+# Mapping Files
+DEFAULT_TEAM_MAPPING_JSON_PATH = f'{DIR_DATA_MAPPINGS}/team_mappings.json'
+DEFAULT_LEAGUE_MAPPING_JSON_PATH = f'{DIR_DATA_MAPPINGS}/league_mappings.json'
+
+# Helper alias for compatibility if needed, or prefer using DIR_DATA_MASTER directly
+DEFAULT_TEAMS_CSV_PATH = f'{DIR_DATA_MASTER}/teams.csv'
+DEFAULT_LEAGUES_CSV_PATH = f'{DIR_DATA_MASTER}/leagues.csv'
+
+# Flashscore File Patterns
+FLASHSCORE_MATCH_FILE_PATTERN = "flashscore_matches_*.csv"
+

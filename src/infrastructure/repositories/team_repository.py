@@ -1,3 +1,4 @@
+import config
 from infrastructure.repositories.csv_repository import CsvRepository
 from domain.models.team import Team
 
@@ -10,7 +11,7 @@ class TeamRepository(CsvRepository):
         "nation": "국가"
     }
     
-    def save(self, teams: list[Team], nation: str = None) -> None:
+    def save(self, teams: list[Team], nation: str) -> None:
         if not teams:
             print("⚠️ 저장할 팀 데이터가 없습니다.")
             return

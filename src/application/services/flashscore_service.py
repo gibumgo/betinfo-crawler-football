@@ -1,6 +1,8 @@
+```python
 from infrastructure.scraping.scrapers.flashscore.flashscore_page import FlashscorePage
 from infrastructure.scraping.parsers.flashscore_match_parser import MatchParser
 from infrastructure.repositories.flashscore_repository import FlashscoreRepository
+import config
 from config import DEFAULT_SEASON
 
 class FlashscoreService:
@@ -8,11 +10,8 @@ class FlashscoreService:
         self.page = page
         self.repository = repository
 
-    def _get_safe_filename_parts(self, league_path: str):
-        parts = [p for p in league_path.split("/") if p]
-        nation = parts[1] if len(parts) > 1 else "unknown"
-        league = parts[2] if len(parts) > 2 else "unknown"
-        return nation.replace("-", "_"), league.replace("-", "_")
+    def _sanitize_filename(self, name: str) -> str:
+        return name.replace("-", "_").replace(" ", "_").lower()
     
     def _extract_league_id(self, league_path: str):
         parts = [p for p in league_path.split("/") if p]
@@ -40,7 +39,8 @@ class FlashscoreService:
         filename = None
         if matches:
             safe_nation, safe_league = self._get_safe_filename_parts(league_path)
-            filename = f"flashscore_matches_{safe_nation}_{safe_league}_{season}.csv"
+            # Use constant for directory
+            filename = f"{config.DIR_DATA_CRAWLED_FLASHSCORE}/flashscore_matches_{safe_nation}_{safe_league}_{season}.csv"
             self.repository.save_matches(filename, matches)
         else:
             print("⚠️ 수집된 경기 데이터가 없습니다. 라운드 범위나 페이지 상태를 확인하세요.")

@@ -70,7 +70,7 @@ class BetinfoService:
                 continue
 
         filename = f"betinfo_proto_rate_{round_value}.csv"
-        full_path = os.path.join(self.output_dir, filename)
+        full_path = os.path.join(config.DIR_DATA_CRAWLED_BETINFO, filename)
         
         self.repository.save(full_path, matches)
         
