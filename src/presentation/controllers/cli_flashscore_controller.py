@@ -102,11 +102,19 @@ class CliFlashscoreController:
         driver = service.page.driver
         meta_service = FlashscoreMetaService(driver, self.repository)
         
-        league_path = self._extract_path_from_url(args.url)
+        url = args.url
+        if not url and args.country and args.league:
+            url = self._construct_league_url(args.country, args.league, "standings")
+            IPCMessenger.log(f"Auto-constructed Standings URL: {url}", level=LOG_LEVEL_INFO)
+
+        if not url:
+            raise ValueError("URL or both Country and League must be specified for metadata task.")
+
+        league_path = self._extract_path_from_url(url)
         if not league_path:
              raise ValueError("Invalid URL format. Expected URL containing /soccer/ or /football/...")
 
-        league_id = self._extract_league_id_from_url(args.url)
+        league_id = self._extract_league_id_from_url(url)
         if not league_id:
             raise ValueError("Invalid Standings URL. Could not find League ID (e.g., .../standings/#/ID/...).")
 
@@ -122,12 +130,21 @@ class CliFlashscoreController:
         
         if result.get('success'):
              IPCMessenger.log(f"Metadata collected successfully. Teams: {result.get('team_count', 0)}", level=LOG_LEVEL_INFO)
+             IPCMessenger.send_data("METADATA_RESULT", result)
         else:
              errs = result.get('errors', [])
              if errs:
                   for e in errs:
                        IPCMessenger.log(f"Metadata Error: {e}", level=LOG_LEVEL_ERROR)
              raise RuntimeError("Metadata collection failed or returned incomplete data.")
+
+    def _construct_league_url(self, country: str, league: str, subpath: str = "") -> str:
+        from config import FLASHSCORE_BASE_URL
+        base = FLASHSCORE_BASE_URL.rstrip('/')
+        url = f"{base}/soccer/{country}/{league}/"
+        if subpath:
+            url += f"{subpath}/"
+        return url
 
     def _extract_league_id_from_url(self, url: str) -> str:
         if "/standings/#/" not in url:
@@ -154,7 +171,19 @@ class CliFlashscoreController:
     def _collect_matches(self, service: FlashscoreService, args):
          IPCMessenger.log("Starting Match Data Collection...", level=LOG_LEVEL_INFO)
          
-         league_path = self._extract_path_from_url(args.url)
+         url = args.url
+         if not url and args.country and args.league:
+             league_slug = args.league
+             if args.season and args.season not in league_slug:
+                 league_slug = f"{league_slug}-{args.season}"
+             
+             url = self._construct_league_url(args.country, league_slug, "results")
+             IPCMessenger.log(f"Auto-constructed Results URL: {url}", level=LOG_LEVEL_INFO)
+
+         if not url:
+             raise ValueError("URL or both Country and League must be specified for matches task.")
+
+         league_path = self._extract_path_from_url(url)
          if not league_path:
              raise ValueError("Invalid URL format. Expected URL containing /football/...")
              
