@@ -14,7 +14,8 @@ from infrastructure.constants.cli_constants import (
     HELP_RECENT, HELP_ROUNDS, HELP_START_ROUND, HELP_END_ROUND,
     HELP_FS_END_ROUND, HELP_CHECKPOINT_INTERVAL, HELP_RESUME,
     ARG_YEAR, HELP_YEAR, ARG_SKIP_EXISTING, HELP_SKIP_EXISTING,
-    HELP_TASK, HELP_URL, HELP_SEASON, HELP_FS_START_ROUND
+    HELP_TASK, HELP_URL, HELP_SEASON, HELP_FS_START_ROUND,
+    ARG_COUNTRY, ARG_LEAGUE, HELP_COUNTRY, HELP_LEAGUE
 )
 
 class MainParser:
@@ -63,6 +64,8 @@ class MainParser:
         flash_group.add_argument(ARG_FS_END_ROUND, type=int, help=HELP_FS_END_ROUND)
         flash_group.add_argument(ARG_CHECKPOINT_INTERVAL, type=int, default=0, help=HELP_CHECKPOINT_INTERVAL)
         flash_group.add_argument(ARG_RESUME, action="store_true", help=HELP_RESUME)
+        flash_group.add_argument(ARG_COUNTRY, type=str, help=HELP_COUNTRY)
+        flash_group.add_argument(ARG_LEAGUE, type=str, help=HELP_LEAGUE)
 
     def parse_args(self) -> argparse.Namespace:
         if len(sys.argv) == 1:

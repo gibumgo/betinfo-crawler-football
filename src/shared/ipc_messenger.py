@@ -24,6 +24,12 @@ class IPCMessenger:
         print(f"{IPC_ERROR}:{code}|{message}", flush=True)
 
     @staticmethod
+    def send_data(key: str, data: Any) -> None:
+        import json
+        json_str = json.dumps(data, ensure_ascii=False)
+        print(f"{IPC_DATA}:{key}|{json_str}", flush=True)
+
+    @staticmethod
     def log(message: str, level: str = "INFO") -> None:
         try:
             formatted = f"[LOG][{level}] {message}\n"

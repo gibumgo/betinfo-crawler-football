@@ -23,10 +23,13 @@ ARG_FS_START_ROUND = "--fs-start-round"
 ARG_FS_END_ROUND = "--fs-end-round"
 ARG_CHECKPOINT_INTERVAL = "--checkpoint-interval"
 ARG_RESUME = "--resume"
+ARG_COUNTRY = "--country"
+ARG_LEAGUE = "--league"
 
 # Choices
 CLI_MODES = ("betinfo", "flashscore", "mapping")
-FLASH_TASKS = ("matches", "metadata", "leagues", "teams")
+CLI_MODES = ("betinfo", "flashscore", "mapping")
+FLASH_TASKS = ("matches", "metadata", "leagues", "teams", "discover", "integrated")
 
 DEFAULT_INTERACTIVE_NAMESPACE = {
     "interactive": True,
@@ -57,3 +60,5 @@ HELP_FS_START_ROUND = "Flashscore 라운드 시작"
 HELP_FS_END_ROUND = "Flashscore 라운드 종료"
 HELP_CHECKPOINT_INTERVAL = "중간 저장 간격 (0: 비활성)"
 HELP_RESUME = "중단 지점부터 재개"
+HELP_COUNTRY = "대상 국가 (영문, 예: england)"
+HELP_LEAGUE = "대상 리그 (영문/슬러그, 예: premier-league)"

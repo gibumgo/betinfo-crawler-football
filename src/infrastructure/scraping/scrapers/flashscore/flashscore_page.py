@@ -19,6 +19,30 @@ class FlashscorePage(BaseScraper):
         if season:
             full_url += f"#/season/{season}/"
         self.open_url(full_url)
+        
+    def open_standings_page(self, league_url_path: str, season: str = None):
+        path = league_url_path.rstrip('/')
+        full_url = f"{self.BASE_URL}{path}/standings/"
+        if season:
+            full_url += f"#/season/{season}/"
+        self.open_url(full_url)
+        self.wait_for_page_load()
+
+    def click_standings_tab(self):
+        try:
+             tab = self.driver.find_element(By.CSS_SELECTOR, "a[href*='/standings/']")
+             tab.click()
+             self.wait_for_page_load()
+        except:
+             print("⚠️ Could not click Standings tab")
+             
+    def click_results_tab(self):
+        try:
+             tab = self.driver.find_element(By.CSS_SELECTOR, "a[href*='/results/']")
+             tab.click()
+             self.wait_for_page_load()
+        except:
+             print("⚠️ Could not click Results tab")
     
     def wait_for_page_load(self):
         try:

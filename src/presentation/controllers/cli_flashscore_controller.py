@@ -14,6 +14,10 @@ from infrastructure.constants.error_codes import (
 )
 from infrastructure.constants.ipc_constants import LOG_LEVEL_INFO, LOG_LEVEL_ERROR
 from shared.ipc_messenger import IPCMessenger
+from application.services.flashscore_discovery_service import FlashscoreDiscoveryService
+from infrastructure.constants.crawler_constants import (
+    CRAWLER_FLASH, FLASH_TASK_METADATA, FLASH_TASK_MATCHES, FLASH_TASK_DISCOVER, FLASH_TASK_INTEGRATED
+)
 
 class CliFlashscoreController:
     
@@ -31,6 +35,24 @@ class CliFlashscoreController:
              self.history_manager.end_session(session_id, "FAILED", error=msg)
              return
 
+        if args.task == FLASH_TASK_DISCOVER:
+            if args.country:
+                try:
+                    self._discover_leagues(args)
+                    IPCMessenger.send_status("COMPLETE", "Discovery Finished")
+                    self.history_manager.end_session(session_id, "SUCCESS", summary=f"Discovery completed for {args.country}")
+                except Exception as e:
+                    IPCMessenger.send_error(ERR_RUNTIME_FAILURE, f"Discovery Failed: {e}")
+            else:
+                try:
+                    self._discover_countries(args)
+                    IPCMessenger.send_status("COMPLETE", "Discovery Finished")
+                    self.history_manager.end_session(session_id, "SUCCESS", summary="Country Discovery completed")
+                except Exception as e:
+                     IPCMessenger.send_error(ERR_RUNTIME_FAILURE, f"Discovery Failed: {e}")
+            
+            return
+
         self.driver = None
         try:
             IPCMessenger.log("Initializing Chrome Driver...", level=LOG_LEVEL_INFO)
@@ -44,6 +66,8 @@ class CliFlashscoreController:
                 self._collect_metadata(service, args)
             elif args.task == FLASH_TASK_MATCHES:
                 self._collect_matches(service, args)
+            elif args.task == FLASH_TASK_INTEGRATED:
+                self._collect_integrated(service, args)
             else:
                  raise ValueError(f"Unknown task: {args.task}")
 
@@ -74,10 +98,6 @@ class CliFlashscoreController:
 
     def _collect_metadata(self, service: FlashscoreService, args):
         IPCMessenger.log("Starting Metadata Collection...", level=LOG_LEVEL_INFO)
-        
-        # Note: 'service' passed here is FlashscoreService, but we need FlashscoreMetaService.
-        # We need access to the driver. Since 'driver' is local to 'run', 
-        # we can access it via service.page.driver because FlashscorePage has self.driver.
         
         driver = service.page.driver
         meta_service = FlashscoreMetaService(driver, self.repository)
@@ -110,20 +130,14 @@ class CliFlashscoreController:
              raise RuntimeError("Metadata collection failed or returned incomplete data.")
 
     def _extract_league_id_from_url(self, url: str) -> str:
-        # Expected format: .../standings/#/OEEq9Yvp/standings/overall/
-        # or .../standings/#/OEEq9Yvp/
         if "/standings/#/" not in url:
             return None
         
         try:
-            # Split by /standings/#/
             parts = url.split("/standings/#/")
             if len(parts) > 1:
-                # The ID is essentially the first part after #/
-                # e.g. OEEq9Yvp/standings/overall/
                 after_hash = parts[1]
                 
-                # Split by / to get the ID
                 id_part = after_hash.split("/")[0]
                 if id_part:
                     return id_part
@@ -133,7 +147,6 @@ class CliFlashscoreController:
 
     def _extract_nation(self, path: str) -> str:
         parts = [p for p in path.split("/") if p]
-        # /soccer/england/premier-league/ -> england
         if len(parts) >= 2:
             return parts[1]
         return "unknown"
@@ -154,14 +167,11 @@ class CliFlashscoreController:
          )
 
     def _extract_path_from_url(self, url: str) -> str:
-        # Check for typical Flashscore URL pattern
         if "/soccer/" not in url and "/football/" not in url:
-            # Fallback for old style or specific inputs, though user said 'soccer' is correct for .co.kr
             if "flashscore" not in url:
                 return None
         
         try:
-            # Normalize to path only
             if "://" in url:
                 start_idx = url.find("/soccer/")
                 if start_idx == -1:
@@ -170,22 +180,14 @@ class CliFlashscoreController:
                 if start_idx != -1:
                      path = url[start_idx:]
                 else:
-                     # Fallback: maybe just path was given?
                      path = url
             else:
                 path = url
 
-            # Strip known suffixes to get the base league path
-            # Suffixes: /results/, /fixtures/, /standings/
             for suffix in ["/results", "/fixtures", "/standings"]:
                 if suffix in path:
                     path = path.split(suffix)[0]
             
-            # Ensure trailing slash for consistency if needed, 
-            # but FlashscorePage.open_results_page does rstrip('/'), so it's fine.
-            # However, to be clean, let's keep it clean.
-            
-            # Remove hash or query params
             if "?" in path:
                 path = path.split("?")[0]
             if "#" in path:
@@ -197,12 +199,52 @@ class CliFlashscoreController:
 
     def _extract_league_name(self, path: str) -> str:
         parts = [p for p in path.split("/") if p]
-        # /football/england/premier-league/ -> premier-league
-        # /football/england/premier-league-2023-2024/ -> premier-league
         if len(parts) >= 3:
             name = parts[2]
-            # Strip year suffix like -2023-2024
             import re
             name = re.sub(r'-\d{4}-\d{4}$', '', name)
             return name
         return "unknown-league"
+
+    def _discover_leagues(self, args):
+        IPCMessenger.log(f"Discovering leagues for {args.country}...", level=LOG_LEVEL_INFO)
+        discovery_service = FlashscoreDiscoveryService()
+        leagues = discovery_service.discover_leagues(args.country)
+        IPCMessenger.send_data("LEAGUES", leagues)
+        if not leagues:
+             IPCMessenger.send_error(ERR_RUNTIME_FAILURE, f"No leagues found for {args.country}")
+
+    def _discover_countries(self, args):
+        IPCMessenger.log(f"Discovering countries...", level=LOG_LEVEL_INFO)
+        discovery_service = FlashscoreDiscoveryService()
+        countries = discovery_service.discover_countries()
+        IPCMessenger.send_data("COUNTRIES", countries)
+        if not countries:
+             IPCMessenger.send_error(ERR_RUNTIME_FAILURE, "No countries found")
+             
+    def _collect_integrated(self, service: FlashscoreService, args):
+         IPCMessenger.log("Starting Integrated Collection...", level=LOG_LEVEL_INFO)
+         
+         country = args.country
+         league = args.league
+         
+         if not country or not league:
+             if args.url:
+                 league_path = self._extract_path_from_url(args.url)
+                 if league_path:
+                     country = self._extract_nation(league_path)
+                     league = self._extract_league_name(league_path)
+         
+         if not country or not league:
+             raise ValueError("Country and League must be specified via arguments or URL.")
+         
+         service.collect_season_data_integrated(
+             country=country,
+             league=league,
+             season=args.season,
+             options={
+                 'skip_standings': False,
+                 'force_full': not args.resume if hasattr(args, 'resume') else False 
+             }
+         )
+
