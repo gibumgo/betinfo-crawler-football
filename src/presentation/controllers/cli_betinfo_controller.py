@@ -108,7 +108,11 @@ class CliBetinfoController:
             IPCMessenger.send_progress((idx / total) * 100)
             
             try:
-                service.collect_round(round_val)
+                year_context = None
+                if len(round_val) >= 4 and round_val[:4].isdigit():
+                    year_context = round_val[:4]
+                
+                service.collect_round(round_val, year=year_context)
             except Exception as e:
                 IPCMessenger.log(f"Failed to collect round {round_val}: {e}", level=LOG_LEVEL_WARN)
                 

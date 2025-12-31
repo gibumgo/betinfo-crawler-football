@@ -24,29 +24,46 @@ class BetinfoService:
         self.parser = BetinfoMatchParser()
 
     def collect_latest_rounds(self, limit: int = 5) -> None:
-        """최신 N개 회차 자동 수집"""
         self.page.open()
-        time.sleep(2)  # 페이지 로딩 대기
+        time.sleep(2)
+
+        available_years = self.page.get_available_years()
+        available_years.sort(reverse=True)
         
-        all_rounds = self.page.get_available_rounds()
+        target_rounds_with_year = []
         
-        # 내림차순 정렬 (높은 숫자가 최신 회차라고 가정)
-        # 예: 2025005, 2025004 ...
-        sorted_rounds = sorted(all_rounds, reverse=True)
+        for year in available_years:
+            if len(target_rounds_with_year) >= limit:
+                break
+                
+            IPCMessenger.log(f"Checking rounds for year {year}...", level="INFO")
+            self.page.navigate_to_year(year)
+            time.sleep(1)
+            
+            rounds = self.page.get_available_rounds()
+            rounds.sort(reverse=True)
+            
+            for r in rounds:
+                if len(target_rounds_with_year) >= limit:
+                    break
+                target_rounds_with_year.append((year, r))
         
-        target_rounds = sorted_rounds[:limit]
+        if not target_rounds_with_year:
+             IPCMessenger.log("No available rounds found.", level="WARNING")
+             return
+
+        IPCMessenger.log(f"Detected latest {len(target_rounds_with_year)} rounds: {target_rounds_with_year}", level="INFO")
         
-        IPCMessenger.log(f"Detected latest {len(target_rounds)} rounds: {target_rounds}", level="INFO")
+        total = len(target_rounds_with_year)
         
-        total = len(target_rounds)
-        for idx, r_val in enumerate(target_rounds):
+        for idx, (year, r_val) in enumerate(target_rounds_with_year):
              IPCMessenger.send_status("COLLECTING_ROUND", r_val)
              IPCMessenger.send_progress((idx / total) * 100)
-             self.collect_round(r_val)
+             self.collect_round(r_val, year=year)
              
         IPCMessenger.send_progress(100)
     
-    def collect_round(self, round_value: str) -> None:
+    def collect_round(self, round_value: str, year: str = None) -> None:
         filename = f"betinfo_proto_rate_{round_value}.csv"
         full_path = os.path.join(config.DIR_DATA_CRAWLED_BETINFO, filename)
 
@@ -55,6 +72,16 @@ class BetinfoService:
             return
 
         self.page.open()
+        
+        if year:
+            self.page.navigate_to_year(year)
+            time.sleep(1)
+        
+        available_rounds = self.page.get_available_rounds()
+        if round_value not in available_rounds:
+            IPCMessenger.log(f"{round_value}회차는 존재하지 않습니다. (Year: {year if year else 'Default'})", level="WARNING")
+            return
+
         self.page.navigate_to_round(round_value)
         self.page.wait_until_table_loaded()
 

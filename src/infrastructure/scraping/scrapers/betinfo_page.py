@@ -43,3 +43,16 @@ class BetinfoPage(BaseScraper):
                 rounds.append(val)
         
         return rounds
+
+    def get_available_years(self) -> list[str]:
+        year_selector = "#mainContent > div:nth-child(5) > span > form > table.searchTable > tbody > tr:nth-child(1) > td:nth-child(5) > select:nth-child(1)"
+        year_element = self.wait_for_element(year_selector)
+        options = year_element.find_elements(By.TAG_NAME, "option")
+        
+        years = []
+        for opt in options:
+            val = opt.get_attribute("value")
+            if val:
+                years.append(val)
+        
+        return years
