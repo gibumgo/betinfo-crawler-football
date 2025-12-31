@@ -11,6 +11,7 @@ class BetinfoRepository(MatchRepository, CsvRepository):
         "home": "홈",
         "away": "원정",
         "game_type": "유형",
+        "handicap_value": "핸디캡",
 
         "win_domestic": "승(국내)",
         "draw_domestic": "무(국내)",

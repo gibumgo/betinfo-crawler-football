@@ -9,6 +9,7 @@ class Match(BaseModel):
     home: str = Field(default="")
     away: str = Field(default="")
     game_type: str = Field(default="")
+    handicap_value: str = Field(default="")
 
     win_domestic: str = Field(default="")
     draw_domestic: str = Field(default="")
@@ -47,6 +48,7 @@ class Match(BaseModel):
             home=str(data.get("home", "")),
             away=str(data.get("away", "")),
             game_type=str(data.get("game_type", "")),
+            handicap_value=str(data.get("handicap_value") or ""),
             win_domestic=str(win),
             draw_domestic=str(draw),
             lose_domestic=str(lose),
