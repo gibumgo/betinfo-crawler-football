@@ -35,10 +35,11 @@ class LeagueNameMatcher(BaseNameMatcher):
                     'search_name': name_ko,
                     'display': display_ko
                 })
+
             if name_en:
                 candidates.append({
                     'id': lid,
                     'search_name': name_en,
-                    'display': display_en
+                    'display': display_ko if name_ko else display_en
                 })
         return candidates

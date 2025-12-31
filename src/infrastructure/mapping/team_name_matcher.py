@@ -29,10 +29,12 @@ class TeamNameMatcher(BaseNameMatcher):
                     'search_name': name_ko,
                     'display': f"{name_ko} ({name_en})"
                 })
+
             if name_en:
+                display_name = f"{name_ko} ({name_en})" if name_ko else name_en
                 candidates.append({
                     'id': tid,
                     'search_name': name_en,
-                    'display': f"{name_ko} ({name_en})"
+                    'display': display_name
                 })
         return candidates

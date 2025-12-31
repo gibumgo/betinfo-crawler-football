@@ -31,12 +31,12 @@ class CliFlashscoreController:
              self.history_manager.end_session(session_id, "FAILED", error=msg)
              return
 
-        driver = None
+        self.driver = None
         try:
             IPCMessenger.log("Initializing Chrome Driver...", level=LOG_LEVEL_INFO)
-            driver = ChromeDriverFactory.create()
+            self.driver = ChromeDriverFactory.create()
             
-            page = FlashscorePage(driver) 
+            page = FlashscorePage(self.driver) 
 
             service = FlashscoreService(page=page, repository=self.repository)
             
@@ -61,12 +61,16 @@ class CliFlashscoreController:
             self.history_manager.end_session(session_id, "FAILED", error=error_msg)
             
         finally:
-            if driver:
-                try:
-                    driver.quit()
-                    IPCMessenger.log("Browser Closed", level=LOG_LEVEL_INFO)
-                except Exception:
-                    pass
+            self.stop()
+
+    def stop(self):
+        if self.driver:
+            try:
+                self.driver.quit()
+                IPCMessenger.log("Browser Closed", level=LOG_LEVEL_INFO)
+            except Exception:
+                pass
+            self.driver = None
 
     def _collect_metadata(self, service: FlashscoreService, args):
         IPCMessenger.log("Starting Metadata Collection...", level=LOG_LEVEL_INFO)

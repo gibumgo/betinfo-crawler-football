@@ -12,9 +12,9 @@ from infrastructure.constants.cli_constants import (
     HELP_MODE, HELP_HEADLESS, HELP_NO_HEADLESS, HELP_OUTPUT_DIR,
     HELP_TIMEOUT, HELP_DEBUG, HELP_CONFIG, HELP_INTERACTIVE,
     HELP_RECENT, HELP_ROUNDS, HELP_START_ROUND, HELP_END_ROUND,
-    HELP_TASK, HELP_URL, HELP_SEASON, HELP_FS_START_ROUND,
     HELP_FS_END_ROUND, HELP_CHECKPOINT_INTERVAL, HELP_RESUME,
-    ARG_YEAR, HELP_YEAR
+    ARG_YEAR, HELP_YEAR, ARG_SKIP_EXISTING, HELP_SKIP_EXISTING,
+    HELP_TASK, HELP_URL, HELP_SEASON, HELP_FS_START_ROUND
 )
 
 class MainParser:
@@ -53,6 +53,7 @@ class MainParser:
         betinfo_group.add_argument(ARG_ROUNDS, type=str, help=HELP_ROUNDS)
         betinfo_group.add_argument(ARG_START_ROUND, type=str, help=HELP_START_ROUND)
         betinfo_group.add_argument(ARG_END_ROUND, type=str, help=HELP_END_ROUND)
+        betinfo_group.add_argument(ARG_SKIP_EXISTING, action="store_true", help=HELP_SKIP_EXISTING)
 
         flash_group = self.parser.add_argument_group("Flashscore Options")
         flash_group.add_argument(ARG_TASK, type=str, choices=FLASH_TASKS, help=HELP_TASK)

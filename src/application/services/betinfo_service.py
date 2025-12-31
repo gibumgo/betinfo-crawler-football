@@ -14,11 +14,13 @@ class BetinfoService:
         self,
         page: BetinfoPage,
         repository: BetinfoRepository,
-        output_dir: str = config.DEFAULT_OUTPUT_DIR
+        output_dir: str = config.DEFAULT_OUTPUT_DIR,
+        skip_existing: bool = False
     ):
         self.page = page
         self.repository = repository
         self.output_dir = output_dir
+        self.skip_existing = skip_existing
         self.parser = BetinfoMatchParser()
 
     def collect_latest_rounds(self, limit: int = 5) -> None:
@@ -45,6 +47,13 @@ class BetinfoService:
         IPCMessenger.send_progress(100)
     
     def collect_round(self, round_value: str) -> None:
+        filename = f"betinfo_proto_rate_{round_value}.csv"
+        full_path = os.path.join(config.DIR_DATA_CRAWLED_BETINFO, filename)
+
+        if self.skip_existing and os.path.exists(full_path):
+            IPCMessenger.log(f"⏩ Round {round_value} already exists. Skipping...", level="INFO")
+            return
+
         self.page.open()
         self.page.navigate_to_round(round_value)
         self.page.wait_until_table_loaded()

@@ -7,7 +7,7 @@ from infrastructure.scraping.parsers.flashscore.team_list_extractor import TeamL
 
 class LeagueMetaParser:  
     @staticmethod
-    def parse_metadata(html_content: str, league_id: str, nation: str, league_name: str, season: str = DEFAULT_SEASON):
+    def parse_metadata(html_content: str, league_id: str, nation: str, league_name: str, season: str = DEFAULT_SEASON, nation_image_url: str = ""):
         result = {
             'league': None,
             'teams': [],
@@ -18,7 +18,6 @@ class LeagueMetaParser:
         try:
             soup = BeautifulSoup(html_content, 'html.parser')
             
-            # Check if page is loaded
             if not soup.select_one("div.container__heading"):
                 result['errors'].append(ParsingException(
                     message="페이지가 제대로 로드되지 않음"
@@ -27,7 +26,7 @@ class LeagueMetaParser:
             
             try:
                 result['league'] = LeagueInfoExtractor.extract(
-                    html_content, league_id, nation, league_name, season
+                    html_content, league_id, nation, league_name, season, nation_image_url
                 )
             except Exception as e:
                 if isinstance(e, ParsingException):

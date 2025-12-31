@@ -20,7 +20,74 @@ class BaseNameMatcher:
         
         self.master_data = self._load_master_data()
         self.learned_mappings = self._load_learned_json()
+        
+        if not self.learned_mappings and self.master_data:
+            self._seed_from_master()
+            self.learned_mappings = self._load_learned_json()
+            
         self.search_candidates = self._build_search_list()
+        
+        self.knowledge_base = self._build_knowledge_base()
+
+    def _seed_from_master(self):
+        seed_data = {}
+        count = 0
+        
+        for item in self.master_data:
+            _id = item.get('league_id') or item.get('team_id') or item.get('id')
+            if not _id: continue
+            
+            aliases = set()
+            
+            if item.get('league_name'): aliases.add(item['league_name'])
+            if item.get('team_name'): aliases.add(item['team_name'])
+            if item.get('name'): aliases.add(item['name'])
+            
+            if item.get('league_name_ko'): aliases.add(item['league_name_ko'])
+            if item.get('team_name_ko'): aliases.add(item['team_name_ko'])
+            if item.get('name_ko'): aliases.add(item['name_ko'])
+            
+            nation = item.get('nation')
+            nation_ko = item.get('nation_ko')
+            
+            l_name = item.get('league_name')
+            l_name_ko = item.get('league_name_ko')
+            
+            if nation and l_name:
+                aliases.add(f"{nation} {l_name}")
+                aliases.add(f"{nation} - {l_name}")
+            
+            if nation_ko and l_name_ko:
+                aliases.add(f"{nation_ko} {l_name_ko}")
+                aliases.add(f"{nation_ko} - {l_name_ko}")
+                aliases.add(f"{nation_ko}{l_name_ko}")
+            
+            if aliases:
+                valid_aliases = [a.strip() for a in aliases if a and a.strip()]
+                if valid_aliases:
+                    seed_data[_id] = {JSON_KEY_ALIASES: valid_aliases}
+                    count += 1
+        
+        if seed_data:
+            IPCMessenger.log(f"🌱 Seeding {self.entity_type} aliases from master: {count} items", level="INFO")
+            try:
+                os.makedirs(os.path.dirname(self.json_path), exist_ok=True)
+                with open(self.json_path, 'w', encoding='utf-8') as f:
+                    json.dump(seed_data, f, ensure_ascii=False, indent=2)
+            except Exception as e:
+                IPCMessenger.log(f"❌ Failed to seed aliases: {e}", level="ERROR")
+
+    def _build_knowledge_base(self) -> dict:
+        kb = {}
+        
+        for cand in self.search_candidates:
+            kb[cand['search_name']] = cand['id']
+            
+        for alias, lid in self.learned_mappings.items():
+            kb[alias] = lid
+            
+        IPCMessenger.log(f"🧠 Knowledge Base loaded: {len(kb)} entries (Master + Aliases)", level="INFO")
+        return kb
 
     def _load_master_data(self) -> List[dict]:
         if not os.path.exists(self.csv_path):
@@ -54,6 +121,7 @@ class BaseNameMatcher:
 
     def learn(self, name: str, fs_id: str):
         self.learned_mappings[name] = fs_id
+        self.knowledge_base[name] = fs_id
         
         data = {}
         if os.path.exists(self.json_path):
@@ -62,7 +130,7 @@ class BaseNameMatcher:
                     data = json.load(f)
             except Exception:
                 data = {}
-
+        
         new_data = {}
         for k, v in data.items():
             if isinstance(v, str):
@@ -79,7 +147,7 @@ class BaseNameMatcher:
                     if a not in existing:
                         new_data[k][JSON_KEY_ALIASES].append(a)
                         existing.add(a)
-
+        
         if fs_id not in new_data:
             new_data[fs_id] = {JSON_KEY_ALIASES: []}
         
@@ -101,18 +169,14 @@ class BaseNameMatcher:
         if not alias:
             return None
             
-        if alias in self.learned_mappings:
-            return self.learned_mappings[alias]
-            
-        for cand in self.search_candidates:
-            if cand['search_name'] == alias or cand.get('display') == alias:
-                return cand['id']
+        if alias in self.knowledge_base:
+            return self.knowledge_base[alias]
                 
         return None
 
     def match(self, target_name: str, interactive: bool = True) -> Optional[str]:
-        if target_name in self.learned_mappings:
-            return self.learned_mappings[target_name]
+        if target_name in self.knowledge_base:
+            return self.knowledge_base[target_name]
 
         best_matches = []
         for cand in self.search_candidates:

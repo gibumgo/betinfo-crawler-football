@@ -5,7 +5,7 @@ from infrastructure.scraping.parsers.flashscore.image_resource_extractor import 
 
 class LeagueInfoExtractor:
     @staticmethod
-    def extract(html_content: str, league_id: str, nation: str, league_name: str, season: str):
+    def extract(html_content: str, league_id: str, nation: str, league_name: str, season: str, nation_image_url: str = ""):
         errors_context = {}
         
         try:
@@ -41,11 +41,12 @@ class LeagueInfoExtractor:
             except Exception:
                 errors_context['league_image_error'] = "리그 이미지 요소 없음"
             
-            try:
-                nation_image_url = ImageResourceExtractor.extract_nation_image_url(soup)
-            except ParsingException as e:
-                nation_image_url = ""
-                errors_context['nation_image_error'] = str(e)
+            if not nation_image_url:
+                try:
+                    nation_image_url = ImageResourceExtractor.extract_nation_image_url(soup)
+                except ParsingException as e:
+                    nation_image_url = ""
+                    errors_context['nation_image_error'] = str(e)
             
             return League.create(
                 league_id=league_id,

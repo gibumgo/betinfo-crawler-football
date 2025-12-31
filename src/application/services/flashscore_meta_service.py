@@ -19,13 +19,15 @@ class FlashscoreMetaService:
         self.page.goto_standings(nation, league_name, league_id)
         
         html_content = self.page.get_page_source()
+        nation_image_url = self.page.get_nation_image_url()
         
         metadata = LeagueMetaParser.parse_metadata(
             html_content, 
             league_id, 
             nation, 
             league_name, 
-            season
+            season,
+            nation_image_url=nation_image_url
         )
         
         if not metadata['league'] and not metadata['errors']:

@@ -13,6 +13,7 @@ ARG_DEBUG = "--debug"
 ARG_CONFIG = "--config"
 ARG_INTERACTIVE = "--interactive"
 ARG_YEAR = "--year"
+ARG_SKIP_EXISTING = "--skip-existing"
 
 # Flashscore Arguments
 ARG_TASK = "--task"
@@ -24,8 +25,8 @@ ARG_CHECKPOINT_INTERVAL = "--checkpoint-interval"
 ARG_RESUME = "--resume"
 
 # Choices
-CLI_MODES = ("betinfo", "flashscore")
-FLASH_TASKS = ("matches", "metadata")
+CLI_MODES = ("betinfo", "flashscore", "mapping")
+FLASH_TASKS = ("matches", "metadata", "leagues", "teams")
 
 DEFAULT_INTERACTIVE_NAMESPACE = {
     "interactive": True,
@@ -47,6 +48,7 @@ HELP_RECENT = "최신 N개 회차 자동 수집"
 HELP_ROUNDS = "특정 회차 목록 (쉼표 구분)"
 HELP_START_ROUND = "범위 수집 시작 회차"
 HELP_END_ROUND = "범위 수집 종료 회차"
+HELP_SKIP_EXISTING = "이미 존재하는 파일은 수집 건너뛰기"
 
 HELP_TASK = "Flashscore 작업 유형"
 HELP_URL = "Flashscore 대상 URL"

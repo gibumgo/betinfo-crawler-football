@@ -13,25 +13,25 @@ from shared.ipc_messenger import IPCMessenger
 
 from infrastructure.mapping.league_name_matcher import LeagueNameMatcher
 
-def main():
-    print("🚀 Starting Team Mapping Tool...")
-    print("--------------------------------")
+def run_mapping_logic(interactive: bool = True):
+    IPCMessenger.log(f"🚀 Starting Team Mapping Tool (Interactive: {interactive})...", level="INFO")
     
     files = glob.glob(os.path.join(config.DIR_DATA_CRAWLED_BETINFO, "betinfo_proto_rate_*.csv"))
     if not files:
-        print(f"❌ No Betinfo CSV files found in {config.DIR_DATA_CRAWLED_BETINFO}")
+        IPCMessenger.send_error(404, f"No Betinfo CSV files found in {config.DIR_DATA_CRAWLED_BETINFO}")
         return
 
     league_matcher = LeagueNameMatcher()
-    print("ℹ️ Loaded League Mappings. Only teams from mapped leagues will be processed.")
+    IPCMessenger.log("ℹ️ Loaded League Mappings. Only teams from mapped leagues will be processed.", level="INFO")
 
     unique_teams = set()
-    print(f"📂 Found {len(files)} Betinfo files. Scanning for teams in mapped leagues...")
+    skipped_leagues = set()
+    IPCMessenger.log(f"📂 Found {len(files)} Betinfo files. Scanning...", level="INFO")
+    IPCMessenger.send_progress(10)
     
     for f in files:
         try:
             df = pd.read_csv(f)
-            # Check for various column name possibilities
             league_col = next((col for col in ['리그명', '리그', 'league', 'League', 'competition'] if col in df.columns), None)
             home_col = next((col for col in ['홈', '홈팀', 'Home', 'home_team'] if col in df.columns), None)
             away_col = next((col for col in ['원정', '원정팀', 'Away', 'away_team'] if col in df.columns), None)
@@ -39,57 +39,66 @@ def main():
             if not league_col or not (home_col or away_col):
                 continue
                 
-            # Iterate rows to check league mapping
             for _, row in df.iterrows():
                 league_name = str(row[league_col]).strip()
-                # Check if this league is mapped (either in aliases or master dict)
                 league_id = league_matcher.get_id_by_alias(league_name)
                 
                 if league_id:
-                   # League is mapped, add teams
                    if home_col and pd.notna(row[home_col]):
                        unique_teams.update([str(row[home_col]).strip()])
                    if away_col and pd.notna(row[away_col]):
                        unique_teams.update([str(row[away_col]).strip()])
                 else:
-                    # League not mapped, skip teams
-                    pass
+                    if league_name not in skipped_leagues:
+                        skipped_leagues.add(league_name)
+                        print(f"⚠️ [DEBUG] Skipped League: '{league_name}' (Not mapped)")
 
         except Exception as e:
             print(f"⚠️ Error reading {f}: {e}")
 
-    print(f"📋 Found {len(unique_teams)} unique teams.")
+    if skipped_leagues:
+        IPCMessenger.log(f"⚠️ Skipped {len(skipped_leagues)} unmapped leagues: {', '.join(skipped_leagues)}", level="WARN")
+
+    IPCMessenger.log(f"📋 Found {len(unique_teams)} unique teams.", level="INFO")
+    IPCMessenger.send_progress(30)
     
     matcher = TeamNameMatcher()
     
     mapped_count = 0
     skipped_count = 0
-    failed_count = 0
+    auto_count = 0
     
     sorted_teams = sorted(list(unique_teams))
+    total_teams = len(sorted_teams)
     
     for i, team_name in enumerate(sorted_teams, 1):
-        print(f"\n[{i}/{len(sorted_teams)}] Processing: {team_name}")
-        
-        if team_name in matcher.learned_mappings:
-            fs_id = matcher.learned_mappings[team_name]
-            print(f"  ✅ Already mapped: {fs_id}")
+        progress = 30 + (i / total_teams * 70)
+        IPCMessenger.send_status("MAPPING", f"{team_name} ({i}/{total_teams})")
+        IPCMessenger.send_progress(progress)
+
+        if team_name in matcher.knowledge_base:
             mapped_count += 1
             continue
             
-        result = matcher.match(team_name, interactive=True)
+        result = matcher.match(team_name, interactive=interactive)
         
         if result:
             mapped_count += 1
+            if not interactive:
+                auto_count += 1
+                IPCMessenger.log(f"✅ Auto-mapped: {team_name} -> {result}", level="INFO")
         else:
-            print(f"  ⏭️ Skipped")
             skipped_count += 1
 
-    print("\n--------------------------------")
-    print("🎉 Mapping Session Completed!")
-    print(f"✅ Mapped: {mapped_count}")
-    print(f"⏭️ Skipped: {skipped_count}")
-    print("--------------------------------")
+    IPCMessenger.log(f"🎉 Mapping Completed! Mapped: {mapped_count} (New Auto: {auto_count}), Skipped: {skipped_count}", level="INFO")
+    IPCMessenger.send_progress(100)
+
+def run_auto_mode(args):
+    """Entry point for Electron auto-mapping mode"""
+    run_mapping_logic(interactive=False)
+
+def main():
+    run_mapping_logic(interactive=True)
 
 if __name__ == "__main__":
     main()

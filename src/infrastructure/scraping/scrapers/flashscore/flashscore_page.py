@@ -45,3 +45,17 @@ class FlashscorePage(BaseScraper):
         self.driver.get(url)
         time.sleep(random.uniform(2, 4))
         self.wait_for_element("div.ui-table__body", timeout=10)
+
+    def get_nation_image_url(self) -> str:
+        try:
+            flag_element = self.driver.find_element(By.CSS_SELECTOR, "#mc > div.container__livetable > div.container__heading > h2 > span")
+            bg_image = flag_element.value_of_css_property("background-image")
+            
+            if bg_image and bg_image != "none":
+                import re
+                match = re.search(r'url\(["\']?(.*?)["\']?\)', bg_image)
+                if match:
+                    return match.group(1)
+            return ""
+        except Exception:
+            return ""

@@ -27,14 +27,19 @@ class CliBetinfoController:
             self.history_manager.end_session(session_id, "FAILED", error=msg)
             return
 
-        driver = None
+        self.driver = None
         try:
             IPCMessenger.log("Initializing Chrome Driver...", level=LOG_LEVEL_INFO)
-            driver = ChromeDriverFactory.create()
+            self.driver = ChromeDriverFactory.create()
             
-            page = BetinfoPage(driver)
+            page = BetinfoPage(self.driver)
             
-            service = BetinfoService(page=page, repository=self.repository, output_dir=args.output_dir)
+            service = BetinfoService(
+                page=page, 
+                repository=self.repository, 
+                output_dir=args.output_dir,
+                skip_existing=args.skip_existing
+            )
             
             self._process_collection(service, target_rounds, args)
             
@@ -53,12 +58,16 @@ class CliBetinfoController:
             self.history_manager.end_session(session_id, "FAILED", error=str(e))
             
         finally:
-            if driver:
-                try:
-                    driver.quit()
-                    IPCMessenger.log("Browser Closed", level=LOG_LEVEL_INFO)
-                except Exception:
-                    pass
+            self.stop()
+
+    def stop(self):
+        if self.driver:
+            try:
+                self.driver.quit()
+                IPCMessenger.log("Browser Closed", level=LOG_LEVEL_INFO)
+            except Exception:
+                pass
+            self.driver = None
 
     def _resolve_target_rounds(self, args) -> list[str]:
         import datetime
