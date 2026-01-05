@@ -90,16 +90,12 @@ class BetinfoService:
         
         match_rows = soup.select('#listView > tbody > tr[league_gubun="1"]')
         
-        round_display = round_value
-        if len(round_value) > 4:
-            round_display = round_value[4:]
-        
         matches = []
         for row in match_rows:
             try:
                 data_dict = self.parser.parse_row(row)
                 if data_dict:
-                    match = Match.of(data_dict, round_display)
+                    match = Match.of(data_dict, round_value)
                     matches.append(match)
             except Exception as e:
                 print(f"Error parsing match: {e}")
